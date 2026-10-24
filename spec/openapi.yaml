@@ -1,0 +1,119 @@
+openapi: 3.1.0
+info:
+  title: ARKHE-AUTH API
+  version: 0.1.0
+  description: |
+    API pública de firma y verificación criptográfica post-cuántica.
+    Firma artefactos con ML-DSA-87 (FIPS 204) y produce recibos
+    verificables offline por cualquier tercero.
+  license:
+    name: MIT
+    url: https://github.com/Marcorojas17/ARKHE-AUTH--_-/blob/main/LICENSE
+
+servers:
+  - url: https://election-strap-ever-checks.trycloudflare.com
+    description: Producción (túnel actual)
+  - url: http://127.0.0.1:8000
+    description: Local (Termux)
+
+paths:
+  /health:
+    get:
+      summary: Estado del servicio
+      operationId: health
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string }
+                  service: { type: string }
+                  version: { type: string }
+
+  /v1/keys:
+    get:
+      summary: Clave pública ML-DSA-87
+      operationId: getKeys
+      responses:
+        '200':
+          description: Clave pública en base64
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ML-DSA-87: { type: string }
+
+  /v1/sign:
+    post:
+      summary: Firmar un artefacto con ML-DSA-87
+      operationId: sign
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Recibo de verificación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationReceipt'
+        '400':
+          description: Archivo vacío
+
+  /v1/verify:
+    post:
+      summary: Verificar un artefacto contra su recibo
+      operationId: verify
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, receipt]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                receipt:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Resultado de verificación
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid: { type: boolean }
+                  errors:
+                    type: array
+                    items: { type: string }
+                  sha256: { type: string }
+                  sig_valid: { type: boolean }
+
+components:
+  schemas:
+    VerificationReceipt:
+      type: object
+      required: [version, sha256, sig_alg, signer_pk_b64, sig_b64, artifact_size]
+      properties:
+        version: { const: verification-v1 }
+        sha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+        sig_alg: { enum: [ML-DSA-87] }
+        signer_pk_b64: { type: string }
+        sig_b64: { type: string }
+        artifact_size: { type: integer, minimum: 0 }
