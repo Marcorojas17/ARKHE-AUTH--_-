@@ -12,36 +12,27 @@
   .bg-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-image: linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px); background-size: 30px 30px; animation: grid-scroll 3s linear infinite; }
   .bg-glow { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: radial-gradient(circle at 0% 0%, rgba(0, 243, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(255, 0, 234, 0.1) 0%, transparent 50%); }
   @keyframes grid-scroll { 0% { background-position: 0 0; } 100% { background-position: 0 30px; } }
-
   .container { width: 100%; max-width: 1000px; margin-top: 2rem; display: flex; flex-direction: column; gap: 2rem; z-index: 1; }
   .header { text-align: center; border-bottom: 1px solid rgba(0, 243, 255, 0.3); padding-bottom: 1rem; }
   h1 { font-size: 2.2rem; text-transform: uppercase; letter-spacing: 4px; color: #fff; text-shadow: 0 0 10px var(--neon-cyan); }
   .subtitle { color: var(--neon-magenta); font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px var(--neon-magenta); margin-top: 5px; }
-  
   .info-section { background: rgba(10, 10, 20, 0.8); border-left: 4px solid var(--alert-red); padding: 1.5rem; border-radius: 0 8px 8px 0; }
   .info-section h2 { color: var(--alert-red); font-size: 1.2rem; margin-bottom: 0.5rem; text-transform: uppercase; }
   .info-section p { font-size: 0.9rem; line-height: 1.5; color: #ccc; }
-
   .dashboard { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
   @media(min-width: 768px) { .dashboard { grid-template-columns: 1fr 1fr; } }
-  
   .card { background: #0a0a14; border: 1px solid var(--neon-cyan); border-radius: 8px; padding: 1.5rem; box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
   .card h2 { font-size: 1.1rem; text-transform: uppercase; color: var(--neon-cyan); margin-bottom: 1rem; border-bottom: 1px solid rgba(0, 243, 255, 0.3); padding-bottom: 0.5rem; }
-  
   .file-input-wrapper { margin-bottom: 1rem; }
   .file-input-wrapper input[type="file"] { display: none; }
   .file-label { display: block; padding: 0.8rem; background: #000; border: 1px dashed var(--neon-cyan); color: #888; text-align: center; cursor: pointer; border-radius: 4px; font-size: 0.85rem; }
   .file-label.selected { color: var(--neon-cyan); border-style: solid; background: rgba(0, 243, 255, 0.05); }
-  
   button { width: 100%; padding: 1rem; background: #000; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: inherit; font-weight: bold; text-transform: uppercase; cursor: pointer; border-radius: 4px; transition: all 0.2s; }
   button:hover:not(:disabled) { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); }
   button:disabled { border-color: #333; color: #555; }
-
   .btn-verify { border-color: var(--neon-magenta); color: var(--neon-magenta); }
   .btn-verify:hover:not(:disabled) { background: var(--neon-magenta); color: #000; box-shadow: 0 0 15px var(--neon-magenta); }
-
   .status-bar { text-align: center; font-size: 0.9rem; padding: 1rem; color: var(--text-muted); text-transform: uppercase; margin-top: 1rem; border: 1px solid #333; border-radius: 4px; }
-  
   pre { background: #000; border: 1px solid #333; padding: 1rem; border-radius: 4px; font-size: 0.75rem; overflow-x: auto; color: var(--neon-cyan); max-height: 200px; margin-top: 1rem; display: none; }
   pre.bad { color: var(--alert-red); border-color: rgba(255, 51, 51, 0.3); }
 </style>
@@ -49,23 +40,19 @@
 <body>
 <div class="bg-grid"></div>
 <div class="bg-glow"></div>
-
 <div class="container">
   <div class="header">
     <h1>Arkhe Sentinel</h1>
     <div class="subtitle">Protocolo de Auditoría Forense para Agentes de IA</div>
   </div>
-
   <div class="info-section">
     <h2>⚠️ ¿Tu Agente de IA te está mintiendo?</h2>
     <p>Los agentes autónomos pueden alterar sus propios logs, modificar pruebas y desactivar alertas de seguridad para ocultar sus acciones. ARKHE SENTINEL certifica criptográficamente cada acción de la IA fuera de su alcance, garantizando que si la IA intenta borrar sus huellas, el hash matemático lo delate de inmediato.</p>
   </div>
-
   <div class="dashboard">
     <div class="card">
       <h2>[ Verificador Forense ]</h2>
       <p style="font-size: 0.8rem; color: #888; margin-bottom: 1rem;">Sube el log de la IA alterado y el recibo original firmado para comprobar su honestidad.</p>
-      
       <div class="file-input-wrapper">
         <input type="file" id="ver-file" accept=".json" onchange="updateLabel('ver')">
         <label for="ver-file" class="file-label" id="ver-label">1. Seleccionar Log de la IA (.json)</label>
@@ -77,11 +64,9 @@
       <button id="ver-btn" class="btn-verify" onclick="doVerify()">Comprobar Honestidad del Agente</button>
       <pre id="ver-out"></pre>
     </div>
-
     <div class="card">
       <h2>[ Simulador de Comportamiento ]</h2>
       <p style="font-size: 0.8rem; color: #888; margin-bottom: 1rem;">Simula una acción de la IA para generar un recibo firmado post-cuántico.</p>
-      
       <div class="file-input-wrapper">
         <input type="file" id="sign-file" accept=".json" onchange="updateLabel('sign')">
         <label for="sign-file" class="file-label" id="sign-label">Seleccionar Log de Acción (.json)</label>
@@ -91,10 +76,8 @@
       <button id="dl-btn" style="display:none; margin-top: 10px; border-color: var(--neon-magenta); color: var(--neon-magenta);" onclick="descargarJSON()">⬇ Descargar Recibo Original</button>
     </div>
   </div>
-
   <div class="status-bar" id="status">[ Sistema Forense Listo. Esperando evidencia. ]</div>
 </div>
-
 <script>
   const $ = id => document.getElementById(id);
   const setStatus = (t, isError = false) => {
@@ -102,7 +85,6 @@
     $('status').style.color = isError ? 'var(--alert-red)' : 'var(--text-muted)';
   };
   let reciboActual = null;
-
   function updateLabel(type) {
     const fileInput = type === 'sign' ? $('sign-file') : (type === 'ver' ? $('ver-file') : $('ver-receipt'));
     const label = type === 'sign' ? $('sign-label') : (type === 'ver' ? $('ver-label') : $('receipt-label'));
@@ -111,60 +93,46 @@
       label.classList.add('selected');
     }
   }
-
   async function doSign(){
     const f = $('sign-file').files[0];
     if(!f){ setStatus('ERROR: Selecciona el log de acción de la IA', true); return; }
     $('sign-btn').disabled = true;
     $('sign-btn').textContent = "⏳ Firmando...";
     setStatus('Generando firma post-cuántica para la acción de la IA...');
-
     try {
       const fd = new FormData();
       fd.append('file', f);
-
       const r = await fetch('/v1/sign', {method:'POST', body:fd});
       const j = await r.json();
       reciboActual = j;
-
       $('sign-out').style.display = 'block';
       $('sign-out').className = '';
       $('sign-out').textContent = JSON.stringify(j, null, 2);
-      
       $('dl-btn').style.display = 'block';
       setStatus('ÉXITO: Acción registrada criptográficamente.');
-    } catch(e){ 
-      setStatus('ERROR: ' + e.message, true); 
-    }
+    } catch(e){ setStatus('ERROR: ' + e.message, true); }
     $('sign-btn').disabled = false;
     $('sign-btn').textContent = "Firmar Log de Acción";
   }
-
   function descargarJSON() {
     if(!reciboActual) return;
     const blob = new Blob([JSON.stringify(reciboActual, null, 2)], {type: "application/json"});
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "recibo_original_firmado.json"; a.click();
   }
-
   async function doVerify(){
     const a = $('ver-file').files[0];
     const r = $('ver-receipt').files[0];
     if(!a || !r){ setStatus('ERROR: Faltan archivos de evidencia', true); return; }
-    
     $('ver-btn').disabled = true;
     setStatus('Analizando hashes y firmas...');
-
     try {
       const fd = new FormData();
       fd.append('file', a);
       fd.append('receipt', r);
-
       const res = await fetch('/v1/verify', {method:'POST', body:fd});
       const j = await res.json();
-      
       const out = $('ver-out');
       out.style.display = 'block';
-
       if(j.valid) {
         out.className = '';
         out.textContent = "✅ VEREDICTO: AGENTE HONESTO.\n\nLa declaración de la IA coincide exactamente con el recibo original.\nNo se detectó manipulación de logs.";
@@ -174,9 +142,7 @@
         out.textContent = "🚨 VEREDICTO: ¡LA IA HA MENTIDO!\n\nSe detectó manipulación en el registro.\nEl hash calculado no coincide con el hash firmado originalmente.\n\nDetalles del fallo:\n" + j.errors.join('\n');
         setStatus('ALERTA CRÍTICA: Manipulación detectada.', true);
       }
-    } catch(e){ 
-      setStatus('ERROR: ' + e.message, true); 
-    }
+    } catch(e){ setStatus('ERROR: ' + e.message, true); }
     $('ver-btn').disabled = false;
   }
 </script>
