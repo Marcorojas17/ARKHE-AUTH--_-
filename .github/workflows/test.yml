@@ -1,7 +1,7 @@
 name: tests
 on:
   push:
-    branches: [ main ]
+    branches: [ main, refactor/non-destructive-v1 ]
   pull_request:
     branches: [ main ]
 jobs:
