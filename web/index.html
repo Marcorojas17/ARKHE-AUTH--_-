@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arkhe Auth — Verificación</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  body{font-family:system-ui,sans-serif;max-width:640px;margin:2rem auto;padding:0 1rem;background:#0f0f0f;color:#eaeaea}
+  h1{font-size:1.4rem;margin-bottom:.3rem}
+  .sub{color:#888;font-size:.9rem;margin-bottom:1.5rem}
+  .card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:1rem;margin:1rem 0}
+  input[type=file]{display:block;margin:.5rem 0;color:#ccc}
+  button{background:#2d7a4a;color:#fff;border:0;padding:.7rem 1.2rem;border-radius:6px;font-size:1rem;cursor:pointer;margin-top:.5rem}
+  button:disabled{background:#333;cursor:not-allowed}
+  pre{background:#000;color:#8fd68f;padding:1rem;border-radius:6px;overflow:auto;font-size:.85rem;max-height:300px}
+  pre.bad{color:#ff6b6b}
+  .status{margin-top:1rem;font-size:.9rem;color:#888}
+</style>
+</head>
+<body>
+
+<h1>Arkhe Auth</h1>
+<p class="sub">Verificación criptográfica post-cuántica (ML-DSA-87) con anclaje Bitcoin.</p>
+
+<div class="card">
+  <strong>Firmar artefacto</strong>
+  <input type="file" id="sign-file">
+  <button id="sign-btn" onclick="doSign()">Firmar</button>
+  <pre id="sign-out" hidden></pre>
+</div>
+
+<div class="card">
+  <strong>Verificar artefacto</strong>
+  <input type="file" id="ver-file">
+  <input type="file" id="ver-receipt" accept=".json">
+  <button id="ver-btn" onclick="doVerify()">Verificar</button>
+  <pre id="ver-out" hidden></pre>
+</div>
+
+<p class="status" id="status">Listo.</p>
+
+<script>
+const $ = id => document.getElementById(id);
+const setStatus = t => $('status').textContent = t;
+
+async function doSign(){
+  const f = $('sign-file').files[0];
+  if(!f){ setStatus('Selecciona un archivo.'); return; }
+  $('sign-btn').disabled = true;
+  setStatus('Firmando con ML-DSA-87...');
+  const fd = new FormData();
+  fd.append('file', f);
+  try {
+    const r = await fetch('/v1/sign', {method:'POST', body:fd});
+    const j = await r.json();
+    $('sign-out').hidden = false;
+    $('sign-out').className = '';
+    $('sign-out').textContent = JSON.stringify(j, null, 2);
+    setStatus('Firmado. Guarda el recibo.');
+  } catch(e){
+    setStatus('Error: ' + e.message);
+  }
+  $('sign-btn').disabled = false;
+}
+
+async function doVerify(){
+  const a = $('ver-file').files[0];
+  const r = $('ver-receipt').files[0];
+  if(!a || !r){ setStatus('Selecciona ambos archivos.'); return; }
+  $('ver-btn').disabled = true;
+  setStatus('Verificando firma...');
+  const fd = new FormData();
+  fd.append('file', a);
+  fd.append('receipt', r);
+  try {
+    const res = await fetch('/v1/verify', {method:'POST', body:fd});
+    const j = await res.json();
+    const out = $('ver-out');
+    out.hidden = false;
+    out.className = j.valid ? '' : 'bad';
+    out.textContent = JSON.stringify(j, null, 2);
+    setStatus(j.valid ? 'VÁLIDO — firma correcta.' : 'INVÁLIDO — artefacto alterado o firma falsa.');
+  } catch(e){
+    setStatus('Error: ' + e.message);
+  }
+  $('ver-btn').disabled = false;
+}
+</script>
+</body>
+</html>
