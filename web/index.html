@@ -3,150 +3,104 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ARKHE-AUTH // Quantum Verification</title>
+<title>ARKHE SENTINEL // AI Audit Console</title>
 <link rel="manifest" href="manifest.json">
 <style>
-  :root { --neon-cyan: #00f3ff; --neon-magenta: #ff00ea; --bg-dark: #05050a; --text-main: #e0e0e0; --text-muted: #888; }
+  :root { --neon-cyan: #00f3ff; --neon-magenta: #ff00ea; --bg-dark: #05050a; --text-main: #e0e0e0; --text-muted: #888; --alert-red: #ff3333; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Courier New', Courier, monospace; background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; overflow-x: hidden; padding: 20px; }
-  .bg-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-image: linear-gradient(rgba(0, 243, 255, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.08) 1px, transparent 1px); background-size: 30px 30px; animation: grid-scroll 3s linear infinite; transition: opacity 0.3s; }
-  .bg-glow { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: radial-gradient(circle at 0% 0%, rgba(0, 243, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(255, 0, 234, 0.15) 0%, transparent 50%); transition: opacity 0.3s; }
+  .bg-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-image: linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px); background-size: 30px 30px; animation: grid-scroll 3s linear infinite; }
+  .bg-glow { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: radial-gradient(circle at 0% 0%, rgba(0, 243, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(255, 0, 234, 0.1) 0%, transparent 50%); }
   @keyframes grid-scroll { 0% { background-position: 0 0; } 100% { background-position: 0 30px; } }
-  body.processing .bg-grid, body.processing .bg-glow { animation: none; opacity: 0; }
-  .container { width: 100%; max-width: 900px; margin-top: 2rem; display: flex; flex-direction: column; gap: 3rem; z-index: 1; }
-  .header { text-align: center; }
-  h1 { font-size: 2.5rem; text-transform: uppercase; letter-spacing: 4px; color: #fff; text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan); margin-bottom: 0.5rem; }
-  .subtitle { color: var(--neon-magenta); font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px var(--neon-magenta); }
-  .tools-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-  @media(min-width: 768px) { .tools-grid { grid-template-columns: 1fr 1fr; } }
+
+  .container { width: 100%; max-width: 1000px; margin-top: 2rem; display: flex; flex-direction: column; gap: 2rem; z-index: 1; }
+  .header { text-align: center; border-bottom: 1px solid rgba(0, 243, 255, 0.3); padding-bottom: 1rem; }
+  h1 { font-size: 2.2rem; text-transform: uppercase; letter-spacing: 4px; color: #fff; text-shadow: 0 0 10px var(--neon-cyan); }
+  .subtitle { color: var(--neon-magenta); font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px var(--neon-magenta); margin-top: 5px; }
+  
+  .info-section { background: rgba(10, 10, 20, 0.8); border-left: 4px solid var(--alert-red); padding: 1.5rem; border-radius: 0 8px 8px 0; }
+  .info-section h2 { color: var(--alert-red); font-size: 1.2rem; margin-bottom: 0.5rem; text-transform: uppercase; }
+  .info-section p { font-size: 0.9rem; line-height: 1.5; color: #ccc; }
+
+  .dashboard { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+  @media(min-width: 768px) { .dashboard { grid-template-columns: 1fr 1fr; } }
+  
   .card { background: #0a0a14; border: 1px solid var(--neon-cyan); border-radius: 8px; padding: 1.5rem; box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
   .card h2 { font-size: 1.1rem; text-transform: uppercase; color: var(--neon-cyan); margin-bottom: 1rem; border-bottom: 1px solid rgba(0, 243, 255, 0.3); padding-bottom: 0.5rem; }
-  .input-group { margin-bottom: 1rem; }
-  .input-group label { display: block; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.3rem; }
-  .input-group input, .input-group select { width: 100%; padding: 0.8rem; background: #000; border: 1px solid #333; color: #fff; font-family: inherit; border-radius: 4px; outline: none; }
-  .input-group input:focus, .input-group select:focus { border-color: var(--neon-cyan); }
+  
   .file-input-wrapper { margin-bottom: 1rem; }
   .file-input-wrapper input[type="file"] { display: none; }
   .file-label { display: block; padding: 0.8rem; background: #000; border: 1px dashed var(--neon-cyan); color: #888; text-align: center; cursor: pointer; border-radius: 4px; font-size: 0.85rem; }
   .file-label.selected { color: var(--neon-cyan); border-style: solid; background: rgba(0, 243, 255, 0.05); }
+  
   button { width: 100%; padding: 1rem; background: #000; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: inherit; font-weight: bold; text-transform: uppercase; cursor: pointer; border-radius: 4px; transition: all 0.2s; }
   button:hover:not(:disabled) { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); }
   button:disabled { border-color: #333; color: #555; }
-  .status-bar { text-align: center; font-size: 0.85rem; padding: 1rem; color: var(--text-muted); text-transform: uppercase; margin-top: 1rem; }
-  #certificado-wrapper { display: none; margin-top: 2rem; width: 100%; max-width: 600px; z-index: 10; flex-direction: column; align-items: center; margin-left: auto; margin-right: auto; }
-  #certificado-html { width: 100%; background: #030308; border: 2px solid var(--neon-cyan); border-radius: 12px; padding: 30px; position: relative; box-shadow: 0 0 30px rgba(0, 243, 255, 0.2); background-image: linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px); background-size: 20px 20px; }
-  .cert-header { text-align: center; margin-bottom: 20px; }
-  .cert-header h2 { color: #fff; font-size: 1.8rem; letter-spacing: 2px; text-shadow: 0 0 10px var(--neon-cyan); border: none; margin: 0; padding: 0; }
-  .cert-header p { color: var(--neon-magenta); font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; margin-top: 5px; }
-  .cert-badge { display: inline-block; background: rgba(0, 243, 255, 0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 8px 20px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-bottom: 20px; }
-  .cert-data { margin-bottom: 25px; font-size: 0.85rem; }
-  .cert-row { display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.1); padding: 8px 0; }
-  .cert-row span:first-child { color: #888; }
-  .cert-row span:last-child { color: var(--neon-cyan); font-weight: bold; word-break: break-all; text-align: right; }
-  .cert-hash-box { background: #000; border: 1px solid rgba(0, 243, 255, 0.3); padding: 15px; border-radius: 6px; margin-bottom: 25px; text-align: center; }
-  .cert-hash-box h4 { color: #888; font-size: 0.8rem; margin-bottom: 10px; }
-  .cert-hash-box p { color: var(--neon-cyan); font-size: 0.75rem; word-break: break-all; }
-  .cert-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(0, 243, 255, 0.2); padding-top: 20px; gap: 10px; }
-  .cert-avatar canvas { border: 2px solid var(--neon-magenta); border-radius: 50%; background: #000; }
-  .cert-qr img { border: 2px solid var(--neon-cyan); border-radius: 6px; }
-  .cert-sign { text-align: right; }
-  .cert-sign p { color: #888; font-size: 0.7rem; margin-bottom: 5px; }
-  .cert-sign h3 { color: var(--neon-magenta); font-size: 1.2rem; font-style: italic; text-shadow: 0 0 5px var(--neon-magenta); }
-  .btn-download { margin-top: 20px; border-color: var(--neon-magenta); color: var(--neon-magenta); width: auto; padding: 1rem 2rem; }
-  .btn-download:hover { background: var(--neon-magenta); color: #000; box-shadow: 0 0 15px var(--neon-magenta); }
+
+  .btn-verify { border-color: var(--neon-magenta); color: var(--neon-magenta); }
+  .btn-verify:hover:not(:disabled) { background: var(--neon-magenta); color: #000; box-shadow: 0 0 15px var(--neon-magenta); }
+
+  .status-bar { text-align: center; font-size: 0.9rem; padding: 1rem; color: var(--text-muted); text-transform: uppercase; margin-top: 1rem; border: 1px solid #333; border-radius: 4px; }
+  
+  pre { background: #000; border: 1px solid #333; padding: 1rem; border-radius: 4px; font-size: 0.75rem; overflow-x: auto; color: var(--neon-cyan); max-height: 200px; margin-top: 1rem; display: none; }
+  pre.bad { color: var(--alert-red); border-color: rgba(255, 51, 51, 0.3); }
 </style>
 </head>
 <body>
 <div class="bg-grid"></div>
 <div class="bg-glow"></div>
+
 <div class="container">
   <div class="header">
-    <h1>Arkhe Auth</h1>
-    <div class="subtitle">Protocolo de Autoría e Infalsificación Digital</div>
+    <h1>Arkhe Sentinel</h1>
+    <div class="subtitle">Protocolo de Auditoría Forense para Agentes de IA</div>
   </div>
-  <div class="tools-grid">
+
+  <div class="info-section">
+    <h2>⚠️ ¿Tu Agente de IA te está mintiendo?</h2>
+    <p>Los agentes autónomos pueden alterar sus propios logs, modificar pruebas y desactivar alertas de seguridad para ocultar sus acciones. ARKHE SENTINEL certifica criptográficamente cada acción de la IA fuera de su alcance, garantizando que si la IA intenta borrar sus huellas, el hash matemático lo delate de inmediato.</p>
+  </div>
+
+  <div class="dashboard">
     <div class="card">
-      <h2>[ Registrar Obra ]</h2>
-      <div class="input-group">
-        <label>Autor / Creador Original</label>
-        <input type="text" id="sign-author" placeholder="Ej. Marco Rojas" value="Marco Rojas">
-      </div>
-      <div class="input-group">
-        <label>Origen de la Obra</label>
-        <select id="sign-origin">
-          <option value="Humano">100% Humano</option>
-          <option value="Colaborativo (Humano+IA)">Colaborativo (Humano + IA)</option>
-          <option value="IA Generativa">100% IA Generativa</option>
-        </select>
-      </div>
-      <div class="input-group">
-        <label>Herramienta IA (Opcional)</label>
-        <input type="text" id="sign-ai-tool" placeholder="Ej. Midjourney, Claude, etc." value="Ninguna">
-      </div>
+      <h2>[ Verificador Forense ]</h2>
+      <p style="font-size: 0.8rem; color: #888; margin-bottom: 1rem;">Sube el log de la IA alterado y el recibo original firmado para comprobar su honestidad.</p>
+      
       <div class="file-input-wrapper">
-        <input type="file" id="sign-file" accept="*/*" onchange="updateLabel('sign')">
-        <label for="sign-file" class="file-label" id="sign-label">Seleccionar Cualquier Archivo</label>
-      </div>
-      <button id="sign-btn" onclick="doSign()">Firmar y Generar Certificado</button>
-    </div>
-    <div class="card">
-      <h2>[ Verificar Autoría ]</h2>
-      <div class="file-input-wrapper">
-        <input type="file" id="ver-file" accept="*/*" onchange="updateLabel('ver')">
-        <label for="ver-file" class="file-label" id="ver-label">1. Seleccionar Archivo Original</label>
+        <input type="file" id="ver-file" accept=".json" onchange="updateLabel('ver')">
+        <label for="ver-file" class="file-label" id="ver-label">1. Seleccionar Log de la IA (.json)</label>
       </div>
       <div class="file-input-wrapper">
         <input type="file" id="ver-receipt" accept=".json" onchange="updateLabel('receipt')">
-        <label for="ver-receipt" class="file-label" id="receipt-label">2. Seleccionar Recibo (.json)</label>
+        <label for="ver-receipt" class="file-label" id="receipt-label">2. Seleccionar Recibo Firmado (.json)</label>
       </div>
-      <button id="ver-btn" onclick="doVerify()">Comprobar Autenticidad</button>
+      <button id="ver-btn" class="btn-verify" onclick="doVerify()">Comprobar Honestidad del Agente</button>
+      <pre id="ver-out"></pre>
     </div>
-  </div>
-  <div class="status-bar" id="status">[ Sistema listo. Registra tu obra. ]</div>
-</div>
 
-<div id="certificado-wrapper">
-  <div id="certificado-html">
-    <div class="cert-header">
-      <h2>ARKHE ZERO</h2>
-      <p>Certificado de Autoría Inmutable</p>
-    </div>
-    <div style="text-align: center;">
-      <div class="cert-badge">⚡ QUANTUM-SAFE · ML-DSA-87</div>
-    </div>
-    <div class="cert-data">
-      <div class="cert-row"><span>AUTOR REGISTRADO</span><span id="cert-author">--</span></div>
-      <div class="cert-row"><span>ORIGEN DE OBRA</span><span id="cert-origin">--</span></div>
-      <div class="cert-row"><span>HERRAMIENTA IA</span><span id="cert-ai-tool">--</span></div>
-      <div class="cert-row"><span>FECHA UTC (SERVER)</span><span id="cert-fecha">--</span></div>
-      <div class="cert-row"><span>TAMAÑO DEL ARCHIVO</span><span id="cert-tamano">-- MB</span></div>
-    </div>
-    <div class="cert-hash-box">
-      <h4>HUELLA CRIPTOGRÁFICA (SHA-256)</h4>
-      <p id="cert-hash">---</p>
-    </div>
-    <div class="cert-footer">
-      <div class="cert-avatar" style="text-align: center;">
-        <canvas id="fractal-canvas" width="70" height="70"></canvas>
-        <div style="color:#888; font-size:0.55rem; text-align:center; margin-top:5px;">ADN CÓDIGO</div>
+    <div class="card">
+      <h2>[ Simulador de Comportamiento ]</h2>
+      <p style="font-size: 0.8rem; color: #888; margin-bottom: 1rem;">Simula una acción de la IA para generar un recibo firmado post-cuántico.</p>
+      
+      <div class="file-input-wrapper">
+        <input type="file" id="sign-file" accept=".json" onchange="updateLabel('sign')">
+        <label for="sign-file" class="file-label" id="sign-label">Seleccionar Log de Acción (.json)</label>
       </div>
-      <div class="cert-qr" style="text-align: center;">
-        <img id="cert-qr-img" src="" style="width:70px; height:70px;">
-        <div style="color:#888; font-size:0.55rem; text-align:center; margin-top:5px;">HASH QR</div>
-      </div>
-      <div class="cert-sign">
-        <p>FIRMA POST-CUÁNTICA</p>
-        <h3>Arkhe // Kintsugi</h3>
-      </div>
+      <button id="sign-btn" onclick="doSign()">Firmar Log de Acción</button>
+      <pre id="sign-out"></pre>
+      <button id="dl-btn" style="display:none; margin-top: 10px; border-color: var(--neon-magenta); color: var(--neon-magenta);" onclick="descargarJSON()">⬇ Descargar Recibo Original</button>
     </div>
   </div>
-  <button class="btn-download" onclick="descargarCertificado()">⬇ Descargar Certificado (PNG)</button>
-  <button class="btn-download" style="border-color:var(--neon-cyan); color:var(--neon-cyan); margin-top:10px;" onclick="descargarJSON()">⬇ Descargar Recibo (.JSON)</button>
+
+  <div class="status-bar" id="status">[ Sistema Forense Listo. Esperando evidencia. ]</div>
 </div>
 
 <script>
   const $ = id => document.getElementById(id);
-  const setStatus = t => $('status').textContent = `[ ${t} ]`;
+  const setStatus = (t, isError = false) => {
+    $('status').textContent = `[ ${t} ]`;
+    $('status').style.color = isError ? 'var(--alert-red)' : 'var(--text-muted)';
+  };
   let reciboActual = null;
 
   function updateLabel(type) {
@@ -158,134 +112,71 @@
     }
   }
 
-  function dibujarAvatarFractal(hash) {
-      const canvas = $('fractal-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const size = canvas.width;
-      ctx.clearRect(0, 0, size, size);
-      const colores = ['#00f3ff', '#ff00ea', '#7000ff'];
-      for (let i = 0; i < 12; i++) {
-          const char1 = hash.charCodeAt(i * 2) || 0;
-          const char2 = hash.charCodeAt((i * 2) + 1) || 0;
-          const x = (char1 % size); const y = (char2 % size); const radio = (char1 % 15) + 5;
-          ctx.beginPath(); ctx.arc(x, y, radio, 0, Math.PI * 2);
-          ctx.strokeStyle = colores[i % colores.length]; ctx.lineWidth = 1.5; ctx.stroke();
-          if (i > 0) {
-              const prevChar1 = hash.charCodeAt((i - 1) * 2) || 0;
-              const prevChar2 = hash.charCodeAt((i - 1) * 2 + 1) || 0;
-              ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(prevChar1 % size, prevChar2 % size);
-              ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)'; ctx.lineWidth = 0.5; ctx.stroke();
-          }
-      }
-  }
-
   async function doSign(){
     const f = $('sign-file').files[0];
-    const author = $('sign-author').value;
-    const origin = $('sign-origin').value;
-    const aiTool = $('sign-ai-tool').value;
-
-    if(!f){ setStatus('ERROR: Selecciona un archivo primero'); return; }
-
-    // Enviamos EL ARCHIVO ORIGINAL sin comprimir
-    document.body.classList.add('processing');
+    if(!f){ setStatus('ERROR: Selecciona el log de acción de la IA', true); return; }
     $('sign-btn').disabled = true;
-    $('sign-btn').textContent = "⏳ Procesando...";
-    setStatus('Subiendo archivo original...');
+    $('sign-btn').textContent = "⏳ Firmando...";
+    setStatus('Generando firma post-cuántica para la acción de la IA...');
 
     try {
       const fd = new FormData();
-      fd.append('file', f); // ARCHIVO ORIGINAL
-      fd.append('author', author);
-      fd.append('origin', origin);
-      fd.append('ai_tool', aiTool);
+      fd.append('file', f);
 
       const r = await fetch('/v1/sign', {method:'POST', body:fd});
-
-      if (!r.ok) {
-        const err = await r.json();
-        throw new Error(err.detail || "Error en el servidor");
-      }
-
       const j = await r.json();
       reciboActual = j;
 
-      $('cert-author').textContent = j.metadata.author.toUpperCase();
-      $('cert-origin').textContent = j.metadata.origin;
-      $('cert-ai-tool').textContent = j.metadata.ai_tool;
-      // USAMOS LA FECHA DEL SERVIDOR
-      $('cert-fecha').textContent = j.metadata.timestamp_utc.replace('T', ' ').substring(0, 19);
-      $('cert-tamano').textContent = (j.artifact_size / 1024 / 1024).toFixed(2) + " MB";
-      $('cert-hash').textContent = j.sha256;
-
-      // EL QR AHORA CONTIENE EL HASH DEL ARCHIVO
-      $('cert-qr-img').src = `https://quickchart.io/qr?text=${j.sha256}&size=150&dark=00f3ff&light=05050a`;
+      $('sign-out').style.display = 'block';
+      $('sign-out').className = '';
+      $('sign-out').textContent = JSON.stringify(j, null, 2);
       
-      dibujarAvatarFractal(j.sha256);
-      $('certificado-wrapper').style.display = 'flex';
-      setStatus('ÉXITO: Certificado generado');
-      setTimeout(() => { $('certificado-wrapper').scrollIntoView({ behavior: 'smooth' }); }, 500);
-
-    } catch(e){
-      setStatus('ERROR: ' + e.message);
-      alert("❌ ERROR AL FIRMAR\n\n" + e.message + "\n\nSi el archivo es muy pesado, intenta con uno menor.");
-    } finally {
-      document.body.classList.remove('processing');
-      $('sign-btn').disabled = false;
-      $('sign-btn').textContent = "Firmar y Generar Certificado";
+      $('dl-btn').style.display = 'block';
+      setStatus('ÉXITO: Acción registrada criptográficamente.');
+    } catch(e){ 
+      setStatus('ERROR: ' + e.message, true); 
     }
+    $('sign-btn').disabled = false;
+    $('sign-btn').textContent = "Firmar Log de Acción";
   }
 
   function descargarJSON() {
     if(!reciboActual) return;
     const blob = new Blob([JSON.stringify(reciboActual, null, 2)], {type: "application/json"});
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "certificado-autoria.json"; a.click();
-  }
-
-  function descargarCertificado() {
-    setStatus('Generando imagen...');
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-    script.onload = () => {
-      html2canvas($('certificado-html'), { backgroundColor: "#030508", scale: 2 }).then(canvas => {
-        const a = document.createElement("a"); a.href = canvas.toDataURL("image/png"); a.download = "certificado-arkhe.png"; a.click();
-        setStatus('Imagen descargada');
-      });
-    };
-    document.head.appendChild(script);
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "recibo_original_firmado.json"; a.click();
   }
 
   async function doVerify(){
     const a = $('ver-file').files[0];
     const r = $('ver-receipt').files[0];
-    if(!a || !r){ setStatus('ERROR: Faltan archivos'); return; }
-
-    document.body.classList.add('processing');
+    if(!a || !r){ setStatus('ERROR: Faltan archivos de evidencia', true); return; }
+    
     $('ver-btn').disabled = true;
-    setStatus('Analizando hashes...');
+    setStatus('Analizando hashes y firmas...');
 
     try {
       const fd = new FormData();
-      fd.append('file', a); // ARCHIVO ORIGINAL
+      fd.append('file', a);
       fd.append('receipt', r);
 
       const res = await fetch('/v1/verify', {method:'POST', body:fd});
       const j = await res.json();
-
-      const receiptData = JSON.parse(await r.text());
-      const meta = receiptData.metadata || {author: "No registrado", origin: "No registrado", ai_tool: "No registrado"};
+      
+      const out = $('ver-out');
+      out.style.display = 'block';
 
       if(j.valid) {
-        setStatus('✅ VÁLIDO: Firma correcta');
-        alert(`✅ VERIFICACIÓN EXITOSA\n\nArchivo auténtico.\nAutor: ${meta.author}\nOrigen: ${meta.origin}\nHash: ${j.sha256}`);
+        out.className = '';
+        out.textContent = "✅ VEREDICTO: AGENTE HONESTO.\n\nLa declaración de la IA coincide exactamente con el recibo original.\nNo se detectó manipulación de logs.";
+        setStatus('Análisis completado: Registro Íntegro.');
       } else {
-        setStatus('❌ ALERTA: Archivo alterado');
-        alert("❌ ERROR DE AUTENTICIDAD\n\nEl archivo fue modificado o el certificado no le corresponde.");
+        out.className = 'bad';
+        out.textContent = "🚨 VEREDICTO: ¡LA IA HA MENTIDO!\n\nSe detectó manipulación en el registro.\nEl hash calculado no coincide con el hash firmado originalmente.\n\nDetalles del fallo:\n" + j.errors.join('\n');
+        setStatus('ALERTA CRÍTICA: Manipulación detectada.', true);
       }
-    } catch(e){ setStatus('ERROR: ' + e.message); }
-
-    document.body.classList.remove('processing');
+    } catch(e){ 
+      setStatus('ERROR: ' + e.message, true); 
+    }
     $('ver-btn').disabled = false;
   }
 </script>
