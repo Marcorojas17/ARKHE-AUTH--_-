@@ -35,3 +35,10 @@ Pre-alpha. Repo en construcción activa.
 ## Contacto
 
 Abrir un GitHub Issue en este repositorio.
+
+## Ecosistema historico
+
+La narrativa conceptual completa vive en:
+https://github.com/Marcorojas17/kronos-protocol
+
+Este repositorio es la implementacion tecnica de produccion.
