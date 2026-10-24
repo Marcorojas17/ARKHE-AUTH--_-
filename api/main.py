@@ -1,5 +1,5 @@
 """Arkhe Auth API — firma, verificacion y PWA con FastAPI."""
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
@@ -29,11 +29,27 @@ def keys():
     return {"ML-DSA-87": base64.b64encode(load_pk()).decode()}
 
 @app.post("/v1/sign")
-async def sign(file: UploadFile = File(...)):
+async def sign(
+    file: UploadFile = File(...), 
+    author: str = Form("Anonimo"), 
+    origin: str = Form("Humano"),
+    ai_tool: str = Form("Ninguna")
+):
     data = await file.read()
     if not data:
         raise HTTPException(400, "archivo vacio")
-    return sign_artifact(data)
+    
+    # Firmar el archivo
+    receipt = sign_artifact(data)
+    
+    # Añadir metadatos de autoría (sin romper la firma del hash original)
+    receipt["metadata"] = {
+        "author": author,
+        "origin": origin,
+        "ai_tool": ai_tool
+    }
+    
+    return receipt
 
 @app.post("/v1/verify")
 async def verify(file: UploadFile = File(...), receipt: UploadFile = File(...)):
@@ -44,12 +60,9 @@ async def verify(file: UploadFile = File(...), receipt: UploadFile = File(...)):
     return verify_receipt(await file.read(), r)
 
 # --- Servir la PWA (App Web) ---
-# Detecta si está empaquetado por PyInstaller
 if getattr(sys, 'frozen', False):
-    # Si es binario, busca en la carpeta temporal que crea PyInstaller
     WEB_DIR = os.path.join(sys._MEIPASS, 'web')
 else:
-    # Si es código normal, busca en la carpeta local
     WEB_DIR = "web"
 
 if os.path.exists(WEB_DIR):
