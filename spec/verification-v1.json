@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Marcorojas17/ARKHE-AUTH--_-/spec/verification-v1.json",
+  "title": "Arkhe Verification Receipt v1",
+  "description": "Recibo de verificacion firmado con ML-DSA-87 (FIPS 204) sobre el hash SHA-256 del artefacto.",
+  "type": "object",
+  "required": ["version", "sha256", "sig_alg", "signer_pk_b64", "sig_b64", "artifact_size"],
+  "properties": {
+    "version":       { "const": "verification-v1" },
+    "sha256":        { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "sig_alg":       { "enum": ["ML-DSA-87"] },
+    "signer_pk_b64": { "type": "string", "minLength": 32 },
+    "sig_b64":       { "type": "string", "minLength": 32 },
+    "artifact_size": { "type": "integer", "minimum": 0 }
+  },
+  "additionalProperties": false
+}
