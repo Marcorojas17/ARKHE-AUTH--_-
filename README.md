@@ -1,3 +1,8 @@
+[![tests](https://github.com/Marcorojas17/ARKHE-AUTH--_-/actions/workflows/test.yml/badge.svg)](https://github.com/Marcorojas17/ARKHE-AUTH--_-/actions/workflows/test.yml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Marcorojas17/ARKHE-AUTH--_-/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Marcorojas17/ARKHE-AUTH--_-)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
+
 # ARKHE-AUTH
 
 Verificación criptográfica anti-falsificación con firma post-cuántica
