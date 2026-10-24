@@ -16,10 +16,12 @@ app = FastAPI(title="Arkhe Auth API", version="0.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 @app.get("/health")
-def health(): return {"status": "ok"}
+def health():
+    return {"status": "ok"}
 
 @app.get("/v1/keys")
-def keys(): return {"ML-DSA-87": base64.b64encode(load_pk()).decode()}
+def keys():
+    return {"ML-DSA-87": base64.b64encode(load_pk()).decode()}
 
 @app.post("/v1/sign")
 async def sign(
@@ -33,11 +35,9 @@ async def sign(
         raise HTTPException(400, "archivo vacio")
 
     if len(data) > 50 * 1024 * 1024:
-        raise HTTPException(413, "El archivo supera el límite de 50MB")
+        raise HTTPException(413, "El archivo supera el limite de 50MB")
 
     receipt = sign_artifact(data)
-    
-    # Añadir metadatos AUTORIZADOS POR EL SERVIDOR
     receipt["metadata"] = {
         "author": author,
         "origin": origin,
@@ -62,4 +62,5 @@ else:
 if os.path.exists(WEB_DIR):
     app.mount("/app", StaticFiles(directory=WEB_DIR, html=True), name="app")
     @app.get("/")
-    def redirect_to_app(): return RedirectResponse(url="/app/")
+    def redirect_to_app():
+        return RedirectResponse(url="/app/")
