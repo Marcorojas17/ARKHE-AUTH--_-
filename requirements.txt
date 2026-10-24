@@ -1,7 +1,7 @@
-fastapi==0.115.6
-uvicorn[standard]==0.34.0
 dilithium-py==1.5.1
-pytest==8.3.4
+fastapi==0.115.6
 httpx==0.28.1
 mcp<2
+pytest==8.3.4
 pyyaml
+uvicorn[standard]==0.34.0
