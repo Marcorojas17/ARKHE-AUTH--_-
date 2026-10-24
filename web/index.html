@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ARKHE-AUTH // Quantum Verification</title>
 <link rel="manifest" href="manifest.json">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https:cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root { --neon-cyan: #00f3ff; --neon-magenta: #ff00ea; --bg-dark: #05050a; --text-main: #e0e0e0; --text-muted: #888; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -260,7 +260,18 @@
       setStatus('Imagen descargada');
     });
   }
-
+function descargarCertificado() {
+  setStatus('Generando imagen...');
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  script.onload = () => {
+    html2canvas($('certificado-html'), { backgroundColor: "#030508", scale: 2 }).then(canvas => {
+      const a = document.createElement("a"); a.href = canvas.toDataURL("image/png"); a.download = "certificado-arkhe.png"; a.click();
+      setStatus('Imagen descargada');
+    });
+  };
+  document.head.appendChild(script);
+}
   async function doVerify(){
     const a = $('ver-file').files[0];
     const r = $('ver-receipt').files[0];
