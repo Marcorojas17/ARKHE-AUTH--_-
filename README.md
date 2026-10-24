@@ -1,14 +1,37 @@
 # ARKHE-AUTH
 
-Autenticación criptográfica post-cuántica (ML-DSA-87, FIPS 204) con anclaje inmutable en Bitcoin (OpenTimestamps).
+Verificación criptográfica anti-falsificación con firma post-cuántica
+(ML-DSA-87, FIPS 204) y anclaje inmutable en Bitcoin (OpenTimestamps).
 
-Estado: pre-alpha. Repo en construcción.
+## Qué hace
+
+Firma cualquier artefacto (documento, imagen, binario, número de serie de
+producto) con ML-DSA-87 y produce un recibo verificable offline por
+cualquier tercero, humano o IA, sin confiar en el servidor que lo emitió.
+
+## Estado
+
+Pre-alpha. Repo en construcción activa.
 
 ## Stack
-- ML-DSA-87 (FIPS 204) para firma
-- OpenTimestamps para anclaje en Bitcoin
-- FastAPI para la API pública
-- PWA para verificación offline
+
+- ML-DSA-87 (FIPS 204) — firma post-cuántica
+- SHA-256 — hash de integridad
+- OpenTimestamps — anclaje en Bitcoin
+- FastAPI — API pública de verificación
+- PWA — verificación offline desde el navegador
+
+## Estructura
+
+- `spec/` — contratos técnicos (JSON Schema, OpenAPI)
+- `core/signer/` — firma ML-DSA-87
+- `core/verifier/` — verificación offline
+- `core/ots/` — anclaje OpenTimestamps
+- `api/` — servicio HTTP
+- `web/` — PWA de verificación
+- `tests/` — pruebas
+- `deploy/` — scripts de despliegue en Termux
 
 ## Contacto
-Abrir un GitHub Issue.
+
+Abrir un GitHub Issue en este repositorio.

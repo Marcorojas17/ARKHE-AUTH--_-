@@ -1,0 +1,10 @@
+# Claves privadas — NUNCA subir
+*.sk
+*.key
+.arkhe/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+venv/
+.venv/
