@@ -1,2 +1,1 @@
-Primera firma publica ARKHE-AUTH 2026-10-24T01:37:09Z
-ALTERADO
+Artefacto de ejemplo ARKHE-AUTH v1 - texto fijo para verificacion reproducible
