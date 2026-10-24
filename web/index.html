@@ -9,14 +9,10 @@
   :root { --neon-cyan: #00f3ff; --neon-magenta: #ff00ea; --bg-dark: #05050a; --text-main: #e0e0e0; --text-muted: #888; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Courier New', Courier, monospace; background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; overflow-x: hidden; padding: 20px; }
-  
   .bg-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-image: linear-gradient(rgba(0, 243, 255, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.08) 1px, transparent 1px); background-size: 30px 30px; animation: grid-scroll 3s linear infinite; transition: opacity 0.3s; }
   .bg-glow { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: radial-gradient(circle at 0% 0%, rgba(0, 243, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(255, 0, 234, 0.15) 0%, transparent 50%); transition: opacity 0.3s; }
   @keyframes grid-scroll { 0% { background-position: 0 0; } 100% { background-position: 0 30px; } }
-  
-  /* Clase para apagar el fondo y liberar RAM */
   body.processing .bg-grid, body.processing .bg-glow { animation: none; opacity: 0; }
-
   .container { width: 100%; max-width: 900px; margin-top: 2rem; display: flex; flex-direction: column; gap: 3rem; z-index: 1; }
   .header { text-align: center; }
   h1 { font-size: 2.5rem; text-transform: uppercase; letter-spacing: 4px; color: #fff; text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan); margin-bottom: 0.5rem; }
@@ -25,7 +21,6 @@
   @media(min-width: 768px) { .tools-grid { grid-template-columns: 1fr 1fr; } }
   .card { background: #0a0a14; border: 1px solid var(--neon-cyan); border-radius: 8px; padding: 1.5rem; box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
   .card h2 { font-size: 1.1rem; text-transform: uppercase; color: var(--neon-cyan); margin-bottom: 1rem; border-bottom: 1px solid rgba(0, 243, 255, 0.3); padding-bottom: 0.5rem; }
-  
   .input-group { margin-bottom: 1rem; }
   .input-group label { display: block; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.3rem; }
   .input-group input, .input-group select { width: 100%; padding: 0.8rem; background: #000; border: 1px solid #333; color: #fff; font-family: inherit; border-radius: 4px; outline: none; }
@@ -38,7 +33,6 @@
   button:hover:not(:disabled) { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); }
   button:disabled { border-color: #333; color: #555; }
   .status-bar { text-align: center; font-size: 0.85rem; padding: 1rem; color: var(--text-muted); text-transform: uppercase; margin-top: 1rem; }
-
   #certificado-wrapper { display: none; margin-top: 2rem; width: 100%; max-width: 600px; z-index: 10; flex-direction: column; align-items: center; margin-left: auto; margin-right: auto; }
   #certificado-html { width: 100%; background: #030308; border: 2px solid var(--neon-cyan); border-radius: 12px; padding: 30px; position: relative; box-shadow: 0 0 30px rgba(0, 243, 255, 0.2); background-image: linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px); background-size: 20px 20px; }
   .cert-header { text-align: center; margin-bottom: 20px; }
@@ -70,7 +64,6 @@
     <h1>Arkhe Auth</h1>
     <div class="subtitle">Protocolo de Autoría e Infalsificación Digital</div>
   </div>
-
   <div class="tools-grid">
     <div class="card">
       <h2>[ Registrar Obra ]</h2>
@@ -96,7 +89,6 @@
       </div>
       <button id="sign-btn" onclick="doSign()">Firmar y Generar Certificado</button>
     </div>
-
     <div class="card">
       <h2>[ Verificar Autoría ]</h2>
       <div class="file-input-wrapper">
@@ -126,7 +118,7 @@
       <div class="cert-row"><span>AUTOR REGISTRADO</span><span id="cert-author">--</span></div>
       <div class="cert-row"><span>ORIGEN DE OBRA</span><span id="cert-origin">--</span></div>
       <div class="cert-row"><span>HERRAMIENTA IA</span><span id="cert-ai-tool">--</span></div>
-      <div class="cert-row"><span>FECHA UTC</span><span id="cert-fecha">--</span></div>
+      <div class="cert-row"><span>FECHA UTC (SERVER)</span><span id="cert-fecha">--</span></div>
       <div class="cert-row"><span>TAMAÑO DEL ARCHIVO</span><span id="cert-tamano">-- MB</span></div>
     </div>
     <div class="cert-hash-box">
@@ -140,7 +132,7 @@
       </div>
       <div class="cert-qr" style="text-align: center;">
         <img id="cert-qr-img" src="" style="width:70px; height:70px;">
-        <div style="color:#888; font-size:0.55rem; text-align:center; margin-top:5px;">VERIFICAR</div>
+        <div style="color:#888; font-size:0.55rem; text-align:center; margin-top:5px;">HASH QR</div>
       </div>
       <div class="cert-sign">
         <p>FIRMA POST-CUÁNTICA</p>
@@ -164,41 +156,6 @@
       label.textContent = fileInput.files[0].name;
       label.classList.add('selected');
     }
-  }
-
-  // COMPRESIÓN DE IMAGEN ANTES DE SUBIR (Para no saturar la RAM)
-  async function comprimirImagen(file) {
-    // Solo comprimimos si es una imagen
-    if (!file.type.startsWith('image/')) return file;
-
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 1200; // Resolución máxima
-          let scale = MAX_WIDTH / img.width;
-          if (scale > 1) scale = 1; // No agrandar
-          
-          canvas.width = img.width * scale;
-          canvas.height = img.height * scale;
-          
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          
-          canvas.toBlob((blob) => {
-            // Retornamos un archivo comprimido (calidad 70%)
-            const newFile = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
-            resolve(newFile);
-          }, 'image/jpeg', 0.7);
-        };
-        img.onerror = () => resolve(file); // Si falla, enviamos original
-      };
-      reader.onerror = () => resolve(file);
-    });
   }
 
   function dibujarAvatarFractal(hash) {
@@ -230,21 +187,16 @@
     const aiTool = $('sign-ai-tool').value;
 
     if(!f){ setStatus('ERROR: Selecciona un archivo primero'); return; }
-    
-    // ACTIVAR MODO AHORRO DE RAM (Apaga el fondo animado)
+
+    // Enviamos EL ARCHIVO ORIGINAL sin comprimir
     document.body.classList.add('processing');
-    
     $('sign-btn').disabled = true;
     $('sign-btn').textContent = "⏳ Procesando...";
-    setStatus('Optimizando archivo...');
+    setStatus('Subiendo archivo original...');
 
     try {
-      // Comprimimos la imagen antes de subirla
-      const archivoOptimizado = await comprimirImagen(f);
-      
-      setStatus('Firmando criptográficamente...');
       const fd = new FormData();
-      fd.append('file', archivoOptimizado);
+      fd.append('file', f); // ARCHIVO ORIGINAL
       fd.append('author', author);
       fd.append('origin', origin);
       fd.append('ai_tool', aiTool);
@@ -262,11 +214,14 @@
       $('cert-author').textContent = j.metadata.author.toUpperCase();
       $('cert-origin').textContent = j.metadata.origin;
       $('cert-ai-tool').textContent = j.metadata.ai_tool;
-      $('cert-fecha').textContent = new Date().toISOString().replace('T', ' ').substring(0, 19);
+      // USAMOS LA FECHA DEL SERVIDOR
+      $('cert-fecha').textContent = j.metadata.timestamp_utc.replace('T', ' ').substring(0, 19);
       $('cert-tamano').textContent = (j.artifact_size / 1024 / 1024).toFixed(2) + " MB";
       $('cert-hash').textContent = j.sha256;
 
-      $('cert-qr-img').src = `https://quickchart.io/qr?text=${encodeURIComponent(window.location.origin + "/app/")}&size=150&dark=00f3ff&light=05050a`;
+      // EL QR AHORA CONTIENE EL HASH DEL ARCHIVO
+      $('cert-qr-img').src = `https://quickchart.io/qr?text=${j.sha256}&size=150&dark=00f3ff&light=05050a`;
+      
       dibujarAvatarFractal(j.sha256);
       $('certificado-wrapper').style.display = 'flex';
       setStatus('ÉXITO: Certificado generado');
@@ -274,9 +229,8 @@
 
     } catch(e){
       setStatus('ERROR: ' + e.message);
-      alert("❌ ERROR AL FIRMAR\n\n" + e.message);
+      alert("❌ ERROR AL FIRMAR\n\n" + e.message + "\n\nSi el archivo es muy pesado, intenta con uno menor.");
     } finally {
-      // APAGAR MODO AHORRO DE RAM
       document.body.classList.remove('processing');
       $('sign-btn').disabled = false;
       $('sign-btn').textContent = "Firmar y Generar Certificado";
@@ -291,7 +245,6 @@
 
   function descargarCertificado() {
     setStatus('Generando imagen...');
-    // Cargar html2canvas de forma diferida
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
     script.onload = () => {
@@ -307,19 +260,16 @@
     const a = $('ver-file').files[0];
     const r = $('ver-receipt').files[0];
     if(!a || !r){ setStatus('ERROR: Faltan archivos'); return; }
-    
+
     document.body.classList.add('processing');
     $('ver-btn').disabled = true;
     setStatus('Analizando hashes...');
-    
+
     try {
-      // Aquí también comprimimos la imagen para que la verificación no falle por peso
-      const archivoOptimizado = await comprimirImagen(a);
-      
-      const fd = new FormData(); 
-      fd.append('file', archivoOptimizado); 
+      const fd = new FormData();
+      fd.append('file', a); // ARCHIVO ORIGINAL
       fd.append('receipt', r);
-      
+
       const res = await fetch('/v1/verify', {method:'POST', body:fd});
       const j = await res.json();
 
@@ -334,7 +284,7 @@
         alert("❌ ERROR DE AUTENTICIDAD\n\nEl archivo fue modificado o el certificado no le corresponde.");
       }
     } catch(e){ setStatus('ERROR: ' + e.message); }
-    
+
     document.body.classList.remove('processing');
     $('ver-btn').disabled = false;
   }
