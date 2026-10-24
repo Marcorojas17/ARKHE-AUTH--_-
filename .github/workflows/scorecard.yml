@@ -1,0 +1,9 @@
+name: Scorecard supply-chain security
+on:
+  workflow_dispatch:
+jobs:
+  analysis:
+    name: Scorecard analysis
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Scorecard disabled temporarily - gcr.io billing issue"
