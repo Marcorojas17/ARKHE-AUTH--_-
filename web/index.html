@@ -5,31 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ARKHE-AUTH // Quantum Verification</title>
 <link rel="manifest" href="manifest.json">
-<script src="https:cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root { --neon-cyan: #00f3ff; --neon-magenta: #ff00ea; --bg-dark: #05050a; --text-main: #e0e0e0; --text-muted: #888; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Courier New', Courier, monospace; background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; overflow-x: hidden; padding: 20px; }
-  .bg-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-image: linear-gradient(rgba(0, 243, 255, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.08) 1px, transparent 1px); background-size: 30px 30px; animation: grid-scroll 3s linear infinite; }
-  .bg-glow { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: radial-gradient(circle at 0% 0%, rgba(0, 243, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(255, 0, 234, 0.15) 0%, transparent 50%); }
+  
+  .bg-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-image: linear-gradient(rgba(0, 243, 255, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.08) 1px, transparent 1px); background-size: 30px 30px; animation: grid-scroll 3s linear infinite; transition: opacity 0.3s; }
+  .bg-glow { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: radial-gradient(circle at 0% 0%, rgba(0, 243, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(255, 0, 234, 0.15) 0%, transparent 50%); transition: opacity 0.3s; }
   @keyframes grid-scroll { 0% { background-position: 0 0; } 100% { background-position: 0 30px; } }
+  
+  /* Clase para apagar el fondo y liberar RAM */
+  body.processing .bg-grid, body.processing .bg-glow { animation: none; opacity: 0; }
+
   .container { width: 100%; max-width: 900px; margin-top: 2rem; display: flex; flex-direction: column; gap: 3rem; z-index: 1; }
   .header { text-align: center; }
   h1 { font-size: 2.5rem; text-transform: uppercase; letter-spacing: 4px; color: #fff; text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan); margin-bottom: 0.5rem; }
   .subtitle { color: var(--neon-magenta); font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px var(--neon-magenta); }
-  .info-section { background: rgba(10, 10, 20, 0.8); border-left: 4px solid var(--neon-cyan); padding: 2rem; border-radius: 0 8px 8px 0; }
-  .info-section h2 { color: var(--neon-cyan); font-size: 1.3rem; margin-bottom: 1rem; text-transform: uppercase; }
-  .info-section p { font-size: 0.95rem; line-height: 1.6; color: #ccc; margin-bottom: 1rem; }
   .tools-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
   @media(min-width: 768px) { .tools-grid { grid-template-columns: 1fr 1fr; } }
   .card { background: #0a0a14; border: 1px solid var(--neon-cyan); border-radius: 8px; padding: 1.5rem; box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
   .card h2 { font-size: 1.1rem; text-transform: uppercase; color: var(--neon-cyan); margin-bottom: 1rem; border-bottom: 1px solid rgba(0, 243, 255, 0.3); padding-bottom: 0.5rem; }
-
+  
   .input-group { margin-bottom: 1rem; }
   .input-group label { display: block; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.3rem; }
   .input-group input, .input-group select { width: 100%; padding: 0.8rem; background: #000; border: 1px solid #333; color: #fff; font-family: inherit; border-radius: 4px; outline: none; }
   .input-group input:focus, .input-group select:focus { border-color: var(--neon-cyan); }
-
   .file-input-wrapper { margin-bottom: 1rem; }
   .file-input-wrapper input[type="file"] { display: none; }
   .file-label { display: block; padding: 0.8rem; background: #000; border: 1px dashed var(--neon-cyan); color: #888; text-align: center; cursor: pointer; border-radius: 4px; font-size: 0.85rem; }
@@ -40,10 +40,7 @@
   .status-bar { text-align: center; font-size: 0.85rem; padding: 1rem; color: var(--text-muted); text-transform: uppercase; margin-top: 1rem; }
 
   #certificado-wrapper { display: none; margin-top: 2rem; width: 100%; max-width: 600px; z-index: 10; flex-direction: column; align-items: center; margin-left: auto; margin-right: auto; }
-  #certificado-html { width: 100%; background: #030308; border: 2px solid var(--neon-cyan); border-radius: 12px; padding: 30px; position: relative; box-shadow: 0 0 30px rgba(0, 243, 255, 0.2), inset 0 0 20px rgba(0, 243, 255, 0.1); background-image: linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px); background-size: 20px 20px; }
-  #certificado-html::before, #certificado-html::after { content: ''; position: absolute; width: 30px; height: 30px; border: 2px solid var(--neon-magenta); pointer-events: none; }
-  #certificado-html::before { top: -2px; left: -2px; border-right: none; border-bottom: none; border-top-left-radius: 12px; }
-  #certificado-html::after { bottom: -2px; right: -2px; border-left: none; border-top: none; border-bottom-right-radius: 12px; }
+  #certificado-html { width: 100%; background: #030308; border: 2px solid var(--neon-cyan); border-radius: 12px; padding: 30px; position: relative; box-shadow: 0 0 30px rgba(0, 243, 255, 0.2); background-image: linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px); background-size: 20px 20px; }
   .cert-header { text-align: center; margin-bottom: 20px; }
   .cert-header h2 { color: #fff; font-size: 1.8rem; letter-spacing: 2px; text-shadow: 0 0 10px var(--neon-cyan); border: none; margin: 0; padding: 0; }
   .cert-header p { color: var(--neon-magenta); font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; margin-top: 5px; }
@@ -130,7 +127,7 @@
       <div class="cert-row"><span>ORIGEN DE OBRA</span><span id="cert-origin">--</span></div>
       <div class="cert-row"><span>HERRAMIENTA IA</span><span id="cert-ai-tool">--</span></div>
       <div class="cert-row"><span>FECHA UTC</span><span id="cert-fecha">--</span></div>
-      <div class="cert-row"><span>TAMAÑO DEL ARCHIVO</span><span id="cert-tamano">-- bytes</span></div>
+      <div class="cert-row"><span>TAMAÑO DEL ARCHIVO</span><span id="cert-tamano">-- MB</span></div>
     </div>
     <div class="cert-hash-box">
       <h4>HUELLA CRIPTOGRÁFICA (SHA-256)</h4>
@@ -160,10 +157,6 @@
   const setStatus = t => $('status').textContent = `[ ${t} ]`;
   let reciboActual = null;
 
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('/app/sw.js').catch(e => console.log(e)));
-  }
-
   function updateLabel(type) {
     const fileInput = type === 'sign' ? $('sign-file') : (type === 'ver' ? $('ver-file') : $('ver-receipt'));
     const label = type === 'sign' ? $('sign-label') : (type === 'ver' ? $('ver-label') : $('receipt-label'));
@@ -171,6 +164,41 @@
       label.textContent = fileInput.files[0].name;
       label.classList.add('selected');
     }
+  }
+
+  // COMPRESIÓN DE IMAGEN ANTES DE SUBIR (Para no saturar la RAM)
+  async function comprimirImagen(file) {
+    // Solo comprimimos si es una imagen
+    if (!file.type.startsWith('image/')) return file;
+
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 1200; // Resolución máxima
+          let scale = MAX_WIDTH / img.width;
+          if (scale > 1) scale = 1; // No agrandar
+          
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          canvas.toBlob((blob) => {
+            // Retornamos un archivo comprimido (calidad 70%)
+            const newFile = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
+            resolve(newFile);
+          }, 'image/jpeg', 0.7);
+        };
+        img.onerror = () => resolve(file); // Si falla, enviamos original
+      };
+      reader.onerror = () => resolve(file);
+    });
   }
 
   function dibujarAvatarFractal(hash) {
@@ -183,9 +211,7 @@
       for (let i = 0; i < 12; i++) {
           const char1 = hash.charCodeAt(i * 2) || 0;
           const char2 = hash.charCodeAt((i * 2) + 1) || 0;
-          const x = (char1 % size);
-          const y = (char2 % size);
-          const radio = (char1 % 15) + 5;
+          const x = (char1 % size); const y = (char2 % size); const radio = (char1 % 15) + 5;
           ctx.beginPath(); ctx.arc(x, y, radio, 0, Math.PI * 2);
           ctx.strokeStyle = colores[i % colores.length]; ctx.lineWidth = 1.5; ctx.stroke();
           if (i > 0) {
@@ -204,17 +230,25 @@
     const aiTool = $('sign-ai-tool').value;
 
     if(!f){ setStatus('ERROR: Selecciona un archivo primero'); return; }
+    
+    // ACTIVAR MODO AHORRO DE RAM (Apaga el fondo animado)
+    document.body.classList.add('processing');
+    
     $('sign-btn').disabled = true;
     $('sign-btn').textContent = "⏳ Procesando...";
-    setStatus('Firmando archivo (esto puede tardar si es muy pesado)...');
-
-    const fd = new FormData();
-    fd.append('file', f);
-    fd.append('author', author);
-    fd.append('origin', origin);
-    fd.append('ai_tool', aiTool);
+    setStatus('Optimizando archivo...');
 
     try {
+      // Comprimimos la imagen antes de subirla
+      const archivoOptimizado = await comprimirImagen(f);
+      
+      setStatus('Firmando criptográficamente...');
+      const fd = new FormData();
+      fd.append('file', archivoOptimizado);
+      fd.append('author', author);
+      fd.append('origin', origin);
+      fd.append('ai_tool', aiTool);
+
       const r = await fetch('/v1/sign', {method:'POST', body:fd});
 
       if (!r.ok) {
@@ -240,11 +274,13 @@
 
     } catch(e){
       setStatus('ERROR: ' + e.message);
-      alert("❌ ERROR AL FIRMAR\n\n" + e.message + "\n\nSi el archivo es mayor a 50MB, la red o tu teléfono podrían no soportarlo.");
+      alert("❌ ERROR AL FIRMAR\n\n" + e.message);
+    } finally {
+      // APAGAR MODO AHORRO DE RAM
+      document.body.classList.remove('processing');
+      $('sign-btn').disabled = false;
+      $('sign-btn').textContent = "Firmar y Generar Certificado";
     }
-
-    $('sign-btn').disabled = false;
-    $('sign-btn').textContent = "Firmar y Generar Certificado";
   }
 
   function descargarJSON() {
@@ -255,31 +291,35 @@
 
   function descargarCertificado() {
     setStatus('Generando imagen...');
-    html2canvas($('certificado-html'), { backgroundColor: "#030508", scale: 2 }).then(canvas => {
-      const a = document.createElement("a"); a.href = canvas.toDataURL("image/png"); a.download = "certificado-arkhe.png"; a.click();
-      setStatus('Imagen descargada');
-    });
+    // Cargar html2canvas de forma diferida
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    script.onload = () => {
+      html2canvas($('certificado-html'), { backgroundColor: "#030508", scale: 2 }).then(canvas => {
+        const a = document.createElement("a"); a.href = canvas.toDataURL("image/png"); a.download = "certificado-arkhe.png"; a.click();
+        setStatus('Imagen descargada');
+      });
+    };
+    document.head.appendChild(script);
   }
-function descargarCertificado() {
-  setStatus('Generando imagen...');
-  const script = document.createElement('script');
-  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-  script.onload = () => {
-    html2canvas($('certificado-html'), { backgroundColor: "#030508", scale: 2 }).then(canvas => {
-      const a = document.createElement("a"); a.href = canvas.toDataURL("image/png"); a.download = "certificado-arkhe.png"; a.click();
-      setStatus('Imagen descargada');
-    });
-  };
-  document.head.appendChild(script);
-}
+
   async function doVerify(){
     const a = $('ver-file').files[0];
     const r = $('ver-receipt').files[0];
     if(!a || !r){ setStatus('ERROR: Faltan archivos'); return; }
+    
+    document.body.classList.add('processing');
     $('ver-btn').disabled = true;
     setStatus('Analizando hashes...');
-    const fd = new FormData(); fd.append('file', a); fd.append('receipt', r);
+    
     try {
+      // Aquí también comprimimos la imagen para que la verificación no falle por peso
+      const archivoOptimizado = await comprimirImagen(a);
+      
+      const fd = new FormData(); 
+      fd.append('file', archivoOptimizado); 
+      fd.append('receipt', r);
+      
       const res = await fetch('/v1/verify', {method:'POST', body:fd});
       const j = await res.json();
 
@@ -288,12 +328,14 @@ function descargarCertificado() {
 
       if(j.valid) {
         setStatus('✅ VÁLIDO: Firma correcta');
-        alert(`✅ VERIFICACIÓN EXITOSA\n\nArchivo auténtico.\nAutor: ${meta.author}\nOrigen: ${meta.origin}\nHerramienta IA: ${meta.ai_tool}\nHash: ${j.sha256}`);
+        alert(`✅ VERIFICACIÓN EXITOSA\n\nArchivo auténtico.\nAutor: ${meta.author}\nOrigen: ${meta.origin}\nHash: ${j.sha256}`);
       } else {
         setStatus('❌ ALERTA: Archivo alterado');
         alert("❌ ERROR DE AUTENTICIDAD\n\nEl archivo fue modificado o el certificado no le corresponde.");
       }
     } catch(e){ setStatus('ERROR: ' + e.message); }
+    
+    document.body.classList.remove('processing');
     $('ver-btn').disabled = false;
   }
 </script>
