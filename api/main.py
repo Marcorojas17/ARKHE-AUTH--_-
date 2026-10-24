@@ -6,6 +6,7 @@ from fastapi.responses import RedirectResponse
 import base64
 import json
 import os
+import sys
 
 from core.signer.signer import sign_artifact, load_pk
 from core.verifier.verifier import verify_receipt
@@ -18,8 +19,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# --- Rutas de la API ---
 
 @app.get("/health")
 def health():
@@ -45,11 +44,17 @@ async def verify(file: UploadFile = File(...), receipt: UploadFile = File(...)):
     return verify_receipt(await file.read(), r)
 
 # --- Servir la PWA (App Web) ---
-# Montamos la carpeta /web en la ruta /app
-if os.path.exists("web"):
-    app.mount("/app", StaticFiles(directory="web", html=True), name="app")
+# Detecta si está empaquetado por PyInstaller
+if getattr(sys, 'frozen', False):
+    # Si es binario, busca en la carpeta temporal que crea PyInstaller
+    WEB_DIR = os.path.join(sys._MEIPASS, 'web')
+else:
+    # Si es código normal, busca en la carpeta local
+    WEB_DIR = "web"
+
+if os.path.exists(WEB_DIR):
+    app.mount("/app", StaticFiles(directory=WEB_DIR, html=True), name="app")
 
     @app.get("/")
     def redirect_to_app():
-        # Si entran a la raiz, los mandamos a la App
         return RedirectResponse(url="/app/")
