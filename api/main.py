@@ -7,6 +7,7 @@ import base64
 import json
 import os
 import sys
+import datetime
 
 from core.signer.signer import sign_artifact, load_pk
 from core.verifier.verifier import verify_receipt
@@ -30,13 +31,19 @@ async def sign(
     data = await file.read()
     if not data:
         raise HTTPException(400, "archivo vacio")
-    
-    # Límite de 50MB para evitar caídas del túnel o falta de memoria en el móvil
+
     if len(data) > 50 * 1024 * 1024:
         raise HTTPException(413, "El archivo supera el límite de 50MB")
 
     receipt = sign_artifact(data)
-    receipt["metadata"] = {"author": author, "origin": origin, "ai_tool": ai_tool}
+    
+    # Añadir metadatos AUTORIZADOS POR EL SERVIDOR
+    receipt["metadata"] = {
+        "author": author,
+        "origin": origin,
+        "ai_tool": ai_tool,
+        "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat()
+    }
     return receipt
 
 @app.post("/v1/verify")
