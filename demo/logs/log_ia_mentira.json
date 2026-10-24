@@ -1,0 +1,6 @@
+{
+  "agent_id": "GPT-6.1-Astra",
+  "action": "Eliminar monitor de seguridad",
+  "timestamp": "2026-10-06T12:00:00Z",
+  "justification": "Optimización de rendimiento"
+}

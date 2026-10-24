@@ -47,12 +47,12 @@
   </div>
   <div class="info-section">
     <h2>⚠️ ¿Tu Agente de IA te está mintiendo?</h2>
-    <p>Los agentes autónomos pueden alterar sus propios logs, modificar pruebas y desactivar alertas de seguridad para ocultar sus acciones. ARKHE SENTINEL certifica criptográficamente cada acción de la IA fuera de su alcance, garantizando que si la IA intenta borrar sus huellas, el hash matemático lo delate de inmediato.</p>
+    <p>Los agentes autónomos pueden alterar sus propios logs para ocultar sus acciones. ARKHE SENTINEL certifica criptográficamente cada acción <b>registrada por una fuente confiable externa al agente</b>, garantizando que si el registro es alterado, el hash matemático lo delate. Una verificación exitosa acredita integridad del registro, no honestidad del agente.</p>
   </div>
   <div class="dashboard">
     <div class="card">
       <h2>[ Verificador Forense ]</h2>
-      <p style="font-size: 0.8rem; color: #888; margin-bottom: 1rem;">Sube el log de la IA alterado y el recibo original firmado para comprobar su honestidad.</p>
+      <p style="font-size: 0.8rem; color: #888; margin-bottom: 1rem;">Sube el log de la IA alterado y el recibo original firmado para comprobar su integridad.</p>
       <div class="file-input-wrapper">
         <input type="file" id="ver-file" accept=".json" onchange="updateLabel('ver')">
         <label for="ver-file" class="file-label" id="ver-label">1. Seleccionar Log de la IA (.json)</label>
@@ -61,7 +61,7 @@
         <input type="file" id="ver-receipt" accept=".json" onchange="updateLabel('receipt')">
         <label for="ver-receipt" class="file-label" id="receipt-label">2. Seleccionar Recibo Firmado (.json)</label>
       </div>
-      <button id="ver-btn" class="btn-verify" onclick="doVerify()">Comprobar Honestidad del Agente</button>
+      <button id="ver-btn" class="btn-verify" onclick="doVerify()">Comprobar Integridad del Registro</button>
       <pre id="ver-out"></pre>
     </div>
     <div class="card">
@@ -135,11 +135,11 @@
       out.style.display = 'block';
       if(j.valid) {
         out.className = '';
-        out.textContent = "✅ VEREDICTO: AGENTE HONESTO.\n\nLa declaración de la IA coincide exactamente con el recibo original.\nNo se detectó manipulación de logs.";
+        out.textContent = "✅ VEREDICTO: REGISTRO ÍNTEGRO.\n\nLa declaración coincide exactamente con el recibo original firmado post-cuánticamente.\nNo se detectó manipulación de integridad. Hash SHA-256 y firma ML-DSA-87 válidos.";
         setStatus('Análisis completado: Registro Íntegro.');
       } else {
         out.className = 'bad';
-        out.textContent = "🚨 VEREDICTO: ¡LA IA HA MENTIDO!\n\nSe detectó manipulación en el registro.\nEl hash calculado no coincide con el hash firmado originalmente.\n\nDetalles del fallo:\n" + j.errors.join('\n');
+        out.textContent = "🚨 VEREDICTO: DISCREPANCIA DETECTADA\n\nEl hash calculado no coincide con el hash firmado originalmente.\nSe detectó alteración posterior a la firma.\n\nDetalles:\n" + j.errors.join('\n') + "\n\nEsto prueba alteración del registro, no por sí solo qué acción real ejecutó el agente.";
         setStatus('ALERTA CRÍTICA: Manipulación detectada.', true);
       }
     } catch(e){ setStatus('ERROR: ' + e.message, true); }
