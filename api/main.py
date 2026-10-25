@@ -14,7 +14,6 @@ from core.verifier.verifier import verify_receipt
 
 app = FastAPI(title="Arkhe Auth API", version="0.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -64,3 +63,19 @@ if os.path.exists(WEB_DIR):
     @app.get("/")
     def redirect_to_app():
         return RedirectResponse(url="/app/")
+
+
+from api import guardian
+app.include_router(guardian.router)
+
+from fastapi.responses import FileResponse
+
+@app.get("/")
+async def root():
+    return FileResponse("web/index.html")
+
+from fastapi.responses import FileResponse
+
+@app.get("/")
+async def root():
+    return FileResponse("web/index.html")
