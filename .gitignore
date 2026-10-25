@@ -8,3 +8,15 @@ __pycache__/
 .env
 venv/
 .venv/
+
+
+# --- ARKHE SECURITY ---
+.env
+.env.*
+*.key
+*.secret
+test_live.py
+test_seguro.py
+/tmp/
+sentinels_ledger.jsonl
+server.log
