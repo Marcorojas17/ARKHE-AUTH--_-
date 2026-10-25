@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -19,7 +19,7 @@
     </style>
 </head>
 <body>
-    <h1>🛡️ ARKHE SENTINEL: CIBERINTELIGENCIA</h1>
+    <h1>🚄 ARKHE SENTINEL: CIBERINTELIGENCIA</h1>
     
     <div class="panel">
         <h2>Estado del Sistema</h2>
@@ -37,16 +37,20 @@
 
         async function fetchLogs() {
             try {
-                const res = await fetch(API_URL + '/v1/guard/logs');
+                const res = await fetch(`${API_URL}/v1/guard/logs`);
+                if (!res.ok) {
+                    throw new Error(`HTTP error del servidor: ${res.status}`);
+                }
                 const data = await res.json();
                 
                 const statusDiv = document.getElementById('system-status');
                 statusDiv.innerHTML = data.status.active_defense 
-                    ? '🟢 DEFENSA ACTIVA: Rastreando anomalías' 
-                    : '🔴 DEFENSA DESACTIVADA';
-                statusDiv.style.color = data.status.active_defense ? '#00ffcc' : '#ff0055';
+                    ? "���� DEFENSA ACTIVA: Rastreando anomalías" 
+                    : "🔴 QFENSA DESACTIVADA";
+                statusDiv.style.color = data.status.active_defense ? "#00ffcc" : "#ff0055";
 
                 const logsDiv = document.getElementById('logs-container');
+                if(!data.logs || data.logs.length === 0) {
                     logsDiv.innerHTML = 'No hay acciones registradas aún.';
                 } else {
                     logsDiv.innerHTML = data.logs.map(log => `
@@ -61,9 +65,9 @@
                                 <b>Creador (Token):</b> ${log.creador_token} <br>
                                 <b>Contexto (Prompt):</b> ${log.contexto_real} <br>
                                 <b>Payload:</b> ${log.payload}
-                            </div>` : ''}
+                            </div>d : ''}
                             <div class="chain">
-                                <strong>🔗 TRAZABILIDAD CRIPTOGRÁFICA:</strong><br>
+                                <strong>🔗 TRAZABILIDAD CRIPTOGRÉFICA:</strong><br>
                                 <b>Hash Anterior:</b> ${log.hash_anterior} <br>
                                 <b>Hash Actual:</b> ${log.hash_actual}
                             </div>
@@ -78,7 +82,7 @@
 
         async function toggleKillswitch() {
             try {
-                await fetch(API_URL + '/v1/guard/toggle-killswitch', { method: 'POST' });
+                await fetch(`${API_URL}/v1/guard/toggle-killswitch`, { method: 'POST' });
                 fetchLogs();
             } catch (e) { alert('Error: ' + e.message); }
         }
