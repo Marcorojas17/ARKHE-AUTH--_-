@@ -35,3 +35,6 @@ env_fix.py
 real_agent.py
 sentinels_ledger.jsonl
 server.log
+sentinels_ledger.jsonl
+sentinel_status.json
+.env
