@@ -22,10 +22,8 @@ class AgentAction(BaseModel):
 
 system_status = {"active_defense": True, "honeypot_triggered": False}
 
-# --- NUEVO ENDPOINT DE DIAGNÓSTICO ---
 @router.get("/v1/health")
 async def health():
-    # Muestra las variables de entorno cargadas (sin sus valores por seguridad)
     return {
         "status": "ok", 
         "env_loaded": list(os.environ.keys()),
@@ -97,7 +95,7 @@ async def intercept_action(action: AgentAction, request: Request):
         with open(LEDGER_FILE, "a") as f:
             f.write(json.dumps(log_entry) + "\n")
     except Exception:
-        pass # Evitar que un error de disco tumbe la API
+        pass
 
     if is_rogue:
         return {"status": "BLOCKED", "detail": reason, "dossier": log_entry}
@@ -128,8 +126,7 @@ async def get_logs(request: Request):
                         log_safe["payload"] = "[REDACTADO]"
                         logs.append(log_safe)
                     except json.JSONDecodeError:
-                        continue # Ignorar líneas corruptas
-            # Ordenar por timestamp
+                        continue
             logs = sorted(logs, key=lambda x: x.get("timestamp", ""), reverse=True)[:50]
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error leyendo ledger: {str(e)}")
@@ -137,6 +134,11 @@ async def get_logs(request: Request):
     return {"status": system_status, "logs": logs}
 
 @router.post("/v1/guard/toggle-killswitch")
-async def toggle_killswitch():
+async def toggle_killswitch(request: Request):
+    # Protegemos el botón de apagado con el mismo token de admin
+    admin_token = os.getenv("ADMIN_TOKEN")
+    if not admin_token or request.headers.get("X-Admin-Token") != admin_token:
+        raise HTTPException(status_code=401, detail="No autorizado.")
+    
     system_status["active_defense"] = not system_status["active_defense"]
     return system_status
