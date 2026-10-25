@@ -1,9 +1,3 @@
-import os
-SECRET_KEY = os.getenv("ARKHE_SECRET")
-if not SECRET_KEY:
-    raise RuntimeError("FATAL: La variable ARKHE_SECRET no está definida. El sistema no arrancará sin su llave criptográfica.")
-SECRET_KEY = SECRET_KEY.encode()
-
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 import datetime
@@ -14,6 +8,11 @@ import hmac
 
 router = APIRouter()
 LEDGER_FILE = "sentinels_ledger.jsonl"
+
+SECRET_KEY = os.getenv("ARKHE_SECRET")
+if not SECRET_KEY:
+    raise RuntimeError("FATAL: La variable ARKHE_SECRET no está definida.")
+SECRET_KEY = SECRET_KEY.encode()
 
 class AgentAction(BaseModel):
     agent_id: str
@@ -47,7 +46,6 @@ async def intercept_action(action: AgentAction, request: Request):
     is_rogue = False
     reason = "Acción permitida."
     
-    # VALIDACIÓN CRIPTOGRÉFICA REAL DE TOKEN
     expected_signature = hmac.new(SECRET_KEY, action.agent_id.encode(), hashlib.sha256).hexdigest()
     expected_token = f"SKL-AGENT-AUTH-{expected_signature}"
     
@@ -94,8 +92,18 @@ async def get_logs():
     logs = []
     if os.path.exists(LEDGER_FILE):
         with open(LEDGER_FILE, "r") as f:
-            logs = [sorted([json.loads(line) for line in f.readlines()], key=lambda x: x["timestamp"], reverse=True)]
-    return {"status": system_status, "logs": logs[:50]}
+            logs_raw = [json.loads(line) for line in f.readlines()]
+            logs_raw = sorted(logs_raw, key=lambda x: x["timestamp"], reverse=True)[:50]
+            
+            # REDACCIÓN DE SECRETOS PARA EL FRONEND PÚBLICO
+            for log in logs_raw:
+                log_safe_copy = log.copy()
+                log_safe_copy["ip_real"] = hashlib.sha256(log.get("ip_real", "").encode()).hexdigest()[:8] + "..."
+                log_safe_copy["creador_token"] = "[REDACTADO]"
+                log_safe_copy["contexto_real"] = "[REDACTADO]"
+                log_safe_copy["payload"] = "[REDACTADO]"
+                logs.append(log_safe_copy)
+    return {"status": system_status, "logs": logs}
 
 @router.post("/v1/guard/toggle-killswitch")
 async def toggle_killswitch():
