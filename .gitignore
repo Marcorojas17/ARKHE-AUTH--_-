@@ -31,3 +31,7 @@ test_seguro.py
 /tmp/
 sentinels_ledger.jsonl
 server.log
+env_fix.py
+real_agent.py
+sentinels_ledger.jsonl
+server.log
