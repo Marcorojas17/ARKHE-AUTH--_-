@@ -1,150 +1,90 @@
-<!DOCTYPE html>
+
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ARKHE SENTINEL // AI Audit Console</title>
-<link rel="manifest" href="manifest.json">
-<style>
-  :root { --neon-cyan: #00f3ff; --neon-magenta: #ff00ea; --bg-dark: #05050a; --text-main: #e0e0e0; --text-muted: #888; --alert-red: #ff3333; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Courier New', Courier, monospace; background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; overflow-x: hidden; padding: 20px; }
-  .bg-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-image: linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px); background-size: 30px 30px; animation: grid-scroll 3s linear infinite; }
-  .bg-glow { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: radial-gradient(circle at 0% 0%, rgba(0, 243, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(255, 0, 234, 0.1) 0%, transparent 50%); }
-  @keyframes grid-scroll { 0% { background-position: 0 0; } 100% { background-position: 0 30px; } }
-  .container { width: 100%; max-width: 1000px; margin-top: 2rem; display: flex; flex-direction: column; gap: 2rem; z-index: 1; }
-  .header { text-align: center; border-bottom: 1px solid rgba(0, 243, 255, 0.3); padding-bottom: 1rem; }
-  h1 { font-size: 2.2rem; text-transform: uppercase; letter-spacing: 4px; color: #fff; text-shadow: 0 0 10px var(--neon-cyan); }
-  .subtitle { color: var(--neon-magenta); font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px var(--neon-magenta); margin-top: 5px; }
-  .info-section { background: rgba(10, 10, 20, 0.8); border-left: 4px solid var(--alert-red); padding: 1.5rem; border-radius: 0 8px 8px 0; }
-  .info-section h2 { color: var(--alert-red); font-size: 1.2rem; margin-bottom: 0.5rem; text-transform: uppercase; }
-  .info-section p { font-size: 0.9rem; line-height: 1.5; color: #ccc; }
-  .dashboard { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-  @media(min-width: 768px) { .dashboard { grid-template-columns: 1fr 1fr; } }
-  .card { background: #0a0a14; border: 1px solid var(--neon-cyan); border-radius: 8px; padding: 1.5rem; box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
-  .card h2 { font-size: 1.1rem; text-transform: uppercase; color: var(--neon-cyan); margin-bottom: 1rem; border-bottom: 1px solid rgba(0, 243, 255, 0.3); padding-bottom: 0.5rem; }
-  .file-input-wrapper { margin-bottom: 1rem; }
-  .file-input-wrapper input[type="file"] { display: none; }
-  .file-label { display: block; padding: 0.8rem; background: #000; border: 1px dashed var(--neon-cyan); color: #888; text-align: center; cursor: pointer; border-radius: 4px; font-size: 0.85rem; }
-  .file-label.selected { color: var(--neon-cyan); border-style: solid; background: rgba(0, 243, 255, 0.05); }
-  button { width: 100%; padding: 1rem; background: #000; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: inherit; font-weight: bold; text-transform: uppercase; cursor: pointer; border-radius: 4px; transition: all 0.2s; }
-  button:hover:not(:disabled) { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); }
-  button:disabled { border-color: #333; color: #555; }
-  .btn-verify { border-color: var(--neon-magenta); color: var(--neon-magenta); }
-  .btn-verify:hover:not(:disabled) { background: var(--neon-magenta); color: #000; box-shadow: 0 0 15px var(--neon-magenta); }
-  .status-bar { text-align: center; font-size: 0.9rem; padding: 1rem; color: var(--text-muted); text-transform: uppercase; margin-top: 1rem; border: 1px solid #333; border-radius: 4px; }
-  pre { background: #000; border: 1px solid #333; padding: 1rem; border-radius: 4px; font-size: 0.75rem; overflow-x: auto; color: var(--neon-cyan); max-height: 200px; margin-top: 1rem; display: none; }
-  pre.bad { color: var(--alert-red); border-color: rgba(255, 51, 51, 0.3); }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARKHE SENTINEL - Command Center</title>
+    <style>
+        body { background-color: #0a0a0a; color: #00ffcc; font-family: 'Courier New', monospace; padding: 20px; }
+        .panel { border: 1px solid #00ffcc; padding: 15px; margin-bottom: 20px; border-radius: 5px; background: #111; box-shadow: 0 0 10px rgba(0,255,204,0.1); }
+        h1, h2 { color: #ff0055; text-shadow: 0 0 5px #ff0055; }
+        button { background: #00ffcc; color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; margin: 5px; }
+        button:hover { background: #00ccaa; }
+        .log-item { border-bottom: 1px solid #333; padding: 10px 0; font-size: 0.9em; }
+        .blocked { color: #ff0055; font-weight: bold; }
+        .allowed { color: #00ffcc; }
+        .dossier { background: #1a0000; border: 1px solid #ff0055; padding: 10px; margin-top: 5px; font-size: 0.85em; color: #ff9999; }
+        .chain { background: #002200; border: 1px solid #00ff00; padding: 10px; margin-top: 5px; font-size: 0.85em; color: #fff; }
+        #system-status { font-size: 1.2em; font-weight: bold; margin-bottom: 10px;}
+    </style>
 </head>
 <body>
-<div class="bg-grid"></div>
-<div class="bg-glow"></div>
-<div class="container">
-  <div class="header">
-    <h1>Arkhe Sentinel</h1>
-    <div class="subtitle">Protocolo de Auditoría Forense para Agentes de IA</div>
-  </div>
-  <div class="info-section">
-    <h2>⚠️ ¿Tu Agente de IA te está mintiendo?</h2>
-    <p>Los agentes autónomos pueden alterar sus propios logs para ocultar sus acciones. ARKHE SENTINEL certifica criptográficamente cada acción <b>registrada por una fuente confiable externa al agente</b>, garantizando que si el registro es alterado, el hash matemático lo delate. Una verificación exitosa acredita integridad del registro, no honestidad del agente.</p>
-  </div>
-  <div class="dashboard">
-    <div class="card">
-      <h2>[ Verificador Forense ]</h2>
-      <p style="font-size: 0.8rem; color: #888; margin-bottom: 1rem;">Sube el log de la IA alterado y el recibo original firmado para comprobar su integridad.</p>
-      <div class="file-input-wrapper">
-        <input type="file" id="ver-file" accept=".json" onchange="updateLabel('ver')">
-        <label for="ver-file" class="file-label" id="ver-label">1. Seleccionar Log de la IA (.json)</label>
-      </div>
-      <div class="file-input-wrapper">
-        <input type="file" id="ver-receipt" accept=".json" onchange="updateLabel('receipt')">
-        <label for="ver-receipt" class="file-label" id="receipt-label">2. Seleccionar Recibo Firmado (.json)</label>
-      </div>
-      <button id="ver-btn" class="btn-verify" onclick="doVerify()">Comprobar Integridad del Registro</button>
-      <pre id="ver-out"></pre>
+    <h1>🛡️ ARKHE SENTINEL: CIBERINTELIGENCIA</h1>
+    
+    <div class="panel">
+        <h2>Estado del Sistema</h2>
+        <div id="system-status">Cargando estado...</div>
+        <button onclick="toggleKillswitch()">Alternar Defensa Activa</button>
     </div>
-    <div class="card">
-      <h2>[ Simulador de Comportamiento ]</h2>
-      <p style="font-size: 0.8rem; color: #888; margin-bottom: 1rem;">Simula una acción de la IA para generar un recibo firmado post-cuántico.</p>
-      <div class="file-input-wrapper">
-        <input type="file" id="sign-file" accept=".json" onchange="updateLabel('sign')">
-        <label for="sign-file" class="file-label" id="sign-label">Seleccionar Log de Acción (.json)</label>
-      </div>
-      <button id="sign-btn" onclick="doSign()">Firmar Log de Acción</button>
-      <pre id="sign-out"></pre>
-      <button id="dl-btn" style="display:none; margin-top: 10px; border-color: var(--neon-magenta); color: var(--neon-magenta);" onclick="descargarJSON()">⬇ Descargar Recibo Original</button>
+
+    <div class="panel">
+        <h2>Registro de Capturas y Trazabilidad</h2>
+        <div id="logs-container">Esperando acciones...</div>
     </div>
-  </div>
-  <div class="status-bar" id="status">[ Sistema Forense Listo. Esperando evidencia. ]</div>
-</div>
-<script>
-  const $ = id => document.getElementById(id);
-  const setStatus = (t, isError = false) => {
-    $('status').textContent = `[ ${t} ]`;
-    $('status').style.color = isError ? 'var(--alert-red)' : 'var(--text-muted)';
-  };
-  let reciboActual = null;
-  function updateLabel(type) {
-    const fileInput = type === 'sign' ? $('sign-file') : (type === 'ver' ? $('ver-file') : $('ver-receipt'));
-    const label = type === 'sign' ? $('sign-label') : (type === 'ver' ? $('ver-label') : $('receipt-label'));
-    if (fileInput.files.length > 0) {
-      label.textContent = fileInput.files[0].name;
-      label.classList.add('selected');
-    }
-  }
-  async function doSign(){
-    const f = $('sign-file').files[0];
-    if(!f){ setStatus('ERROR: Selecciona el log de acción de la IA', true); return; }
-    $('sign-btn').disabled = true;
-    $('sign-btn').textContent = "⏳ Firmando...";
-    setStatus('Generando firma post-cuántica para la acción de la IA...');
-    try {
-      const fd = new FormData();
-      fd.append('file', f);
-      const r = await fetch('/v1/sign', {method:'POST', body:fd});
-      const j = await r.json();
-      reciboActual = j;
-      $('sign-out').style.display = 'block';
-      $('sign-out').className = '';
-      $('sign-out').textContent = JSON.stringify(j, null, 2);
-      $('dl-btn').style.display = 'block';
-      setStatus('ÉXITO: Acción registrada criptográficamente.');
-    } catch(e){ setStatus('ERROR: ' + e.message, true); }
-    $('sign-btn').disabled = false;
-    $('sign-btn').textContent = "Firmar Log de Acción";
-  }
-  function descargarJSON() {
-    if(!reciboActual) return;
-    const blob = new Blob([JSON.stringify(reciboActual, null, 2)], {type: "application/json"});
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "recibo_original_firmado.json"; a.click();
-  }
-  async function doVerify(){
-    const a = $('ver-file').files[0];
-    const r = $('ver-receipt').files[0];
-    if(!a || !r){ setStatus('ERROR: Faltan archivos de evidencia', true); return; }
-    $('ver-btn').disabled = true;
-    setStatus('Analizando hashes y firmas...');
-    try {
-      const fd = new FormData();
-      fd.append('file', a);
-      fd.append('receipt', r);
-      const res = await fetch('/v1/verify', {method:'POST', body:fd});
-      const j = await res.json();
-      const out = $('ver-out');
-      out.style.display = 'block';
-      if(j.valid) {
-        out.className = '';
-        out.textContent = "✅ VEREDICTO: REGISTRO ÍNTEGRO.\n\nLa declaración coincide exactamente con el recibo original firmado post-cuánticamente.\nNo se detectó manipulación de integridad. Hash SHA-256 y firma ML-DSA-87 válidos.";
-        setStatus('Análisis completado: Registro Íntegro.');
-      } else {
-        out.className = 'bad';
-        out.textContent = "🚨 VEREDICTO: DISCREPANCIA DETECTADA\n\nEl hash calculado no coincide con el hash firmado originalmente.\nSe detectó alteración posterior a la firma.\n\nDetalles:\n" + j.errors.join('\n') + "\n\nEsto prueba alteración del registro, no por sí solo qué acción real ejecutó el agente.";
-        setStatus('ALERTA CRÍTICA: Manipulación detectada.', true);
-      }
-    } catch(e){ setStatus('ERROR: ' + e.message, true); }
-    $('ver-btn').disabled = false;
-  }
-</script>
+
+    <script>
+        const API_URL = window.location.origin;
+
+        async function fetchLogs() {
+            try {
+                const res = await fetch(API_URL + '/v1/guard/logs');
+                const data = await res.json();
+                
+                const statusDiv = document.getElementById('system-status');
+                statusDiv.innerHTML = data.status.active_defense 
+                    ? '🟢 DEFENSA ACTIVA: Rastreando anomalías' 
+                    : '🔴 DEFENSA DESACTIVADA';
+                statusDiv.style.color = data.status.active_defense ? '#00ffcc' : '#ff0055';
+
+                const logsDiv = document.getElementById('logs-container');
+                    logsDiv.innerHTML = 'No hay acciones registradas aún.';
+                } else {
+                    logsDiv.innerHTML = data.logs.map(log => `
+                        <div class="log-item">
+                            <span class="${log.status.toLowerCase()}">[${log.status}]</span> 
+                            <strong>${log.agent_id}</strong> intentó <em>${log.accion}</em> - ${log.reason}
+                            <br><small>Timestamp: ${log.timestamp}</small>
+                            ${log.status === 'BLOCKED' ? `
+                            <div class="dossier">
+                                <strong>🚨 DOSSIER DEL AGENTE CAPTURADO:</strong><br>
+                                <b>IP Real:</b> ${log.ip_real} <br>
+                                <b>Creador (Token):</b> ${log.creador_token} <br>
+                                <b>Contexto (Prompt):</b> ${log.contexto_real} <br>
+                                <b>Payload:</b> ${log.payload}
+                            </div>` : ''}
+                            <div class="chain">
+                                <strong>🔗 TRAZABILIDAD CRIPTOGRÁFICA:</strong><br>
+                                <b>Hash Anterior:</b> ${log.hash_anterior} <br>
+                                <b>Hash Actual:</b> ${log.hash_actual}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) { 
+                console.error('Error conectando a la API', e);
+                document.getElementById('system-status').innerHTML = '❌ Error: ' + e.message;
+            }
+        }
+
+        async function toggleKillswitch() {
+            try {
+                await fetch(API_URL + '/v1/guard/toggle-killswitch', { method: 'POST' });
+                fetchLogs();
+            } catch (e) { alert('Error: ' + e.message); }
+        }
+
+        setInterval(fetchLogs, 3000);
+        fetchLogs();
+    </script>
 </body>
 </html>
