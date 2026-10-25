@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 from pydantic import BaseModel
 import datetime
 import hashlib
@@ -88,21 +88,27 @@ async def intercept_action(action: AgentAction, request: Request):
     return {"status": "ALLOWED", "detail": reason, "dossier": log_entry}
 
 @router.get("/v1/guard/logs")
-async def get_logs():
+async def get_logs(request: Request):
+    admin_token = os.getenv("ADMIN_TOKEN")
+    if not admin_token:
+        raise HTTPException(status_code=500, detail="ADMIN_TOKEN no configurado en el servidor")
+    token_recibido = request.headers.get("X-Admin-Token")
+    if token_recibido != admin_token:
+        raise HTTPException(status_code=401, detail="No autorizado. Token de administrador inválido.")
+    
     logs = []
     if os.path.exists(LEDGER_FILE):
         with open(LEDGER_FILE, "r") as f:
             logs_raw = [json.loads(line) for line in f.readlines()]
             logs_raw = sorted(logs_raw, key=lambda x: x["timestamp"], reverse=True)[:50]
             
-            # REDACCIÓN DE SECRETOS PARA EL FRONEND PÚBLICO
             for log in logs_raw:
-                log_safe_copy = log.copy()
-                log_safe_copy["ip_real"] = hashlib.sha256(log.get("ip_real", "").encode()).hexdigest()[:8] + "..."
-                log_safe_copy["creador_token"] = "[REDACTADO]"
-                log_safe_copy["contexto_real"] = "[REDACTADO]"
-                log_safe_copy["payload"] = "[REDACTADO]"
-                logs.append(log_safe_copy)
+                log_safe = log.copy()
+                log_safe["ip_real"] = hashlib.sha256(log.get("ip_real", "").encode()).hexdigest()[:8] + "..."
+                log_safe["creador_token"] = "[REDACTADO]"
+                log_safe["contexto_real"] = "[REDACTADO]"
+                log_safe["payload"] = "[REDACTADO]"
+                logs.append(log_safe)
     return {"status": system_status, "logs": logs}
 
 @router.post("/v1/guard/toggle-killswitch")

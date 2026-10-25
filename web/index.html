@@ -6,7 +6,7 @@
     <title>ARKHE SENTINEL - Command Center</title>
     <style>
         body { background-color: #0a0a0a; color: #00ffcc; font-family: 'Courier New', monospace; padding: 20px; }
-        .panel { border: 1px solid #00ffcc; padding: 15px; margin-bottom: 20px; border-radius: 5px; background: #111; box-shadow: 0 0 10px rgba(0,255,204,0.1); }
+        .panel { border: 1px solid #00ffcc; padding: 15px; margin-bottom: 20px; border-radius: 5px; background: #111; }
         h1, h2 { color: #ff0055; text-shadow: 0 0 5px #ff0055; }
         button { background: #00ffcc; color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; margin: 5px; }
         button:hover { background: #00ccaa; }
@@ -15,12 +15,21 @@
         .allowed { color: #00ffcc; }
         .dossier { background: #1a0000; border: 1px solid #ff0055; padding: 10px; margin-top: 5px; font-size: 0.85em; color: #ff9999; }
         .chain { background: #002200; border: 1px solid #00ff00; padding: 10px; margin-top: 5px; font-size: 0.85em; color: #fff; }
-        #system-status { font-size: 1.2em; font-weight: bold; margin-bottom: 10px;}
+        #system-status { font-size: 1.2em; font-weight: bold; margin-bottom: 10px; }
+        #auth-panel { display: none; }
+        input { padding: 8px; margin: 5px; background: #000; border: 1px solid #00ffcc; color: #00ffcc; }
     </style>
 </head>
 <body>
-    <h1>🚄 ARKHE SENTINEL: CIBERINTELIGENCIA</h1>
-    
+    <h1>🛡️ ARKHE SENTINEL: CIBERINTELIGENCIA</h1>
+
+    <div class="panel" id="auth-panel">
+        <h2>🔐 Autenticación de Administrador</h2>
+        <p>Ingresa tu ADMIN_TOKEN para ver los logs:</p>
+        <input type="password" id="admin-token" placeholder="ADMIN_TOKEN">
+        <button onclick="saveToken()">Guardar Token</button>
+    </div>
+
     <div class="panel">
         <h2>Estado del Sistema</h2>
         <div id="system-status">Cargando estado...</div>
@@ -34,20 +43,39 @@
 
     <script>
         const API_URL = window.location.origin;
+        let adminToken = localStorage.getItem('arkhe_admin_token') || '';
+
+        function saveToken() {
+            const input = document.getElementById('admin-token');
+            adminToken = input.value.trim();
+            localStorage.setItem('arkhe_admin_token', adminToken);
+            document.getElementById('auth-panel').style.display = 'none';
+            fetchLogs();
+        }
 
         async function fetchLogs() {
+            if (!adminToken) {
+                document.getElementById('auth-panel').style.display = 'block';
+                document.getElementById('logs-container').innerHTML = '🔒 Ingresa tu token de administrador para ver los logs.';
+                return;
+            }
             try {
-                const res = await fetch(`${API_URL}/v1/guard/logs`);
-                if (!res.ok) {
-                    throw new Error(`HTTP error del servidor: ${res.status}`);
+                const res = await fetch(API_URL + '/v1/guard/logs', {
+                    headers: { 'X-Admin-Token': adminToken }
+                });
+                if (res.status === 401) {
+                    document.getElementById('auth-panel').style.display = 'block';
+                    document.getElementById('logs-container').innerHTML = '🔒 Token inválido. Ingresa nuevamente.';
+                    return;
                 }
+                if (!res.ok) throw new Error('HTTP ' + res.status);
                 const data = await res.json();
                 
                 const statusDiv = document.getElementById('system-status');
                 statusDiv.innerHTML = data.status.active_defense 
-                    ? "���� DEFENSA ACTIVA: Rastreando anomalías" 
-                    : "🔴 QFENSA DESACTIVADA";
-                statusDiv.style.color = data.status.active_defense ? "#00ffcc" : "#ff0055";
+                    ? '🟢 DEFENSA ACTIVA: Rastreando anomalías' 
+                    : '🔴 DEFENSA DESACTIVADA';
+                statusDiv.style.color = data.status.active_defense ? '#00ffcc' : '#ff0055';
 
                 const logsDiv = document.getElementById('logs-container');
                 if(!data.logs || data.logs.length === 0) {
@@ -61,13 +89,13 @@
                             ${log.status === 'BLOCKED' ? `
                             <div class="dossier">
                                 <strong>🚨 DOSSIER DEL AGENTE CAPTURADO:</strong><br>
-                                <b>IP Real:</b> ${log.ip_real} <br>
+                                <b>IP Hash:</b> ${log.ip_real} <br>
                                 <b>Creador (Token):</b> ${log.creador_token} <br>
                                 <b>Contexto (Prompt):</b> ${log.contexto_real} <br>
                                 <b>Payload:</b> ${log.payload}
-                            </div>d : ''}
+                            </div>` : ''}
                             <div class="chain">
-                                <strong>🔗 TRAZABILIDAD CRIPTOGRÉFICA:</strong><br>
+                                <strong>🔗 TRAZABILIDAD CRIPTOGRÁFICA:</strong><br>
                                 <b>Hash Anterior:</b> ${log.hash_anterior} <br>
                                 <b>Hash Actual:</b> ${log.hash_actual}
                             </div>
@@ -75,14 +103,14 @@
                     `).join('');
                 }
             } catch (e) { 
-                console.error('Error conectando a la API', e);
+                console.error('Error', e);
                 document.getElementById('system-status').innerHTML = '❌ Error: ' + e.message;
             }
         }
 
         async function toggleKillswitch() {
             try {
-                await fetch(`${API_URL}/v1/guard/toggle-killswitch`, { method: 'POST' });
+                await fetch(API_URL + '/v1/guard/toggle-killswitch', { method: 'POST' });
                 fetchLogs();
             } catch (e) { alert('Error: ' + e.message); }
         }
