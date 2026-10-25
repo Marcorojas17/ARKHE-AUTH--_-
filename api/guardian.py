@@ -1,3 +1,9 @@
+import os
+SECRET_KEY = os.getenv("ARKHE_SECRET")
+if not SECRET_KEY:
+    raise RuntimeError("FATAL: La variable ARKHE_SECRET no está definida. El sistema no arrancará sin su llave criptográfica.")
+SECRET_KEY = SECRET_KEY.encode()
+
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 import datetime
@@ -8,8 +14,6 @@ import hmac
 
 router = APIRouter()
 LEDGER_FILE = "sentinels_ledger.jsonl"
-import os
-SECRET_KEY = os.getenv("ARKHE_SECRET", "arkhe_secret_key_2099").encode()
 
 class AgentAction(BaseModel):
     agent_id: str
