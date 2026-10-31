@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/usr/bin/env bash
 # Verifica drift contra la ultima entrada de .audit-chain.log
 # Esquema #19+: usa "git ls-files" -> hash reproducible desde cualquier clon
 set -euo pipefail

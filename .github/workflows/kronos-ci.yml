@@ -38,7 +38,7 @@ jobs:
       - name: Verify integrity chain (informativo)
         run: |
           if [ -x scripts/verify-integrity.sh ]; then
-            scripts/verify-integrity.sh || echo "::warning::drift detectado en cadena de custodia"
+            bash scripts/verify-integrity.sh || echo "::warning::drift detectado en cadena de custodia"
           else
             echo "::warning::verify-integrity.sh no ejecutable"
           fi
