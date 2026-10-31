@@ -1,0 +1,42 @@
+name: kronos-ci
+
+on:
+  push:
+    branches: [main]
+    paths: ['kronos/**']
+  pull_request:
+    paths: ['kronos/**']
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: kronos
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: kronos/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Test
+        run: pnpm test
+
+      - name: Verify integrity chain (informativo)
+        run: |
+          if [ -x scripts/verify-integrity.sh ]; then
+            scripts/verify-integrity.sh || echo "::warning::drift detectado en cadena de custodia"
+          else
+            echo "::warning::verify-integrity.sh no ejecutable"
+          fi
