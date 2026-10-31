@@ -1,0 +1,16 @@
+{
+  "name": "@kronos/core",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./legado": "./src/legado/index.js"
+  },
+  "scripts": {
+    "test": "node --test tests/"
+  },
+  "dependencies": {
+    "@kronos/sha256-verifier": "workspace:*"
+  }
+}

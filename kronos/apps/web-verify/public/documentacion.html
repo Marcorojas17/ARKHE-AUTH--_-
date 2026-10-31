@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Documentacion · KRONOS</title>
+  <meta name="description" content="Documentacion tecnica del protocolo KRONOS. Especificacion de receipts, Merkle Trees, verificacion en cliente.">
+  <link rel="icon" type="image/svg+xml" href="/sello.svg">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font:15px/1.7 system-ui,sans-serif;background:#0a0a0a;color:#e5e5e5;min-height:100vh;padding:2rem 1rem}
+    main{max-width:720px;margin:0 auto}
+    header{display:flex;align-items:center;gap:1rem;margin-bottom:3rem;padding-bottom:1.5rem;border-bottom:1px solid #262626}
+    header img{width:140px;height:auto}
+    header a{margin-left:auto;color:#888;text-decoration:none;font-size:.85rem}
+    header a:hover{color:#f59e0b}
+    h1{font-size:2rem;font-weight:700;margin-bottom:.5rem;letter-spacing:-.02em}
+    .meta{color:#888;font-size:.85rem;margin-bottom:3rem}
+    h2{font-size:1.15rem;font-weight:600;margin:2.5rem 0 .75rem;color:#f59e0b;letter-spacing:.02em}
+    h3{font-size:.95rem;font-weight:600;margin:1.5rem 0 .5rem;color:#e5e5e5}
+    p{margin-bottom:1rem;color:#d4d4d4}
+    code{background:#141414;border:1px solid #262626;padding:.15rem .4rem;border-radius:4px;font-family:ui-monospace,monospace;font-size:.85em;color:#f59e0b}
+    pre{background:#141414;border:1px solid #262626;padding:1rem;border-radius:8px;overflow-x:auto;margin:1rem 0;font-family:ui-monospace,monospace;font-size:.8rem;line-height:1.5;color:#d4d4d4}
+    pre code{background:none;border:none;padding:0;color:inherit}
+    ul{list-style:none;padding:0;margin:1rem 0}
+    li{padding:.65rem .9rem;background:#141414;border:1px solid #262626;border-radius:6px;margin-bottom:.5rem}
+    li strong{color:#f59e0b;display:block;margin-bottom:.15rem;font-size:.85rem;letter-spacing:.02em}
+    li span{color:#a3a3a3;font-size:.85rem}
+    a{color:#f59e0b;text-decoration:none}
+    a:hover{text-decoration:underline}
+    footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid #262626;color:#666;font-size:.85rem;text-align:center}
+    footer a{color:#888}
+    footer a:hover{color:#f59e0b}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="/logo.svg" alt="KRONOS">
+    <a href="/">Verificador</a>
+  </header>
+
+  <h1>Documentacion</h1>
+  <p class="meta">Especificacion tecnica · v0.2 · 2026</p>
+
+  <h2>Que es un receipt</h2>
+  <p>Un receipt es un objeto JSON autocontenido que prueba que un archivo especifico existia en un arbol Merkle con una raiz especifica. Cualquiera puede verificar un receipt sin contactar a KRONOS ni a ningun servidor.</p>
+
+  <pre><code>{
+  "v": 1,
+  "algorithm": "sha256-rfc6962",
+  "fileSha256": "d1707...",
+  "leafHash": "ddd2b...",
+  "leafIndex": 1,
+  "treeSize": 2,
+  "root": "fee64...",
+  "proof": [
+    { "side": "L", "hash": "ddd2b..." }
+  ],
+  "timestamp": "2026-10-31T16:47:45.161Z"
+}</code></pre>
+
+  <h2>Verificacion paso a paso</h2>
+  <p>Dado un archivo y un receipt, la verificacion consta de tres comprobaciones:</p>
+  <ul>
+    <li><strong>1. SHA-256 del archivo</strong><span>Calcular el SHA-256 del archivo. Comparar con el campo <code>fileSha256</code>. Si difiere, el archivo fue alterado.</span></li>
+    <li><strong>2. Leaf hash</strong><span>Calcular SHA-256(0x00 || archivo). Comparar con <code>leafHash</code>. Domain separation RFC 6962.</span></li>
+    <li><strong>3. Proof de inclusion</strong><span>Reconstruir la raiz del arbol aplicando la proof al leafHash. Comparar con <code>root</code>. Si coincide, el archivo existia en ese arbol.</span></li>
+  </ul>
+
+  <h2>Especificacion de hashes</h2>
+  <h3>Hash de hoja</h3>
+  <pre><code>leafHash = SHA-256(0x00 || archivo)</code></pre>
+  <p>El prefijo <code>0x00</code> distingue hojas de nodos internos. Previene que un atacante presente un nodo interno como hoja (second-preimage attack).</p>
+
+  <h3>Hash de nodo</h3>
+  <pre><code>nodeHash = SHA-256(0x01 || hijo_izquierdo || hijo_derecho)</code></pre>
+  <p>El prefijo <code>0x01</code> completa el domain separation. Cada nivel del arbol tiene un prefijo distinto.</p>
+
+  <h3>Promocion de nodo impar</h3>
+  <p>Cuando un nivel tiene un numero impar de nodos, el ultimo nodo se promueve al siguiente nivel sin hashear. Esto es distinto del enfoque de Bitcoin (que duplica el nodo), y evita la vulnerabilidad CVE-2012-2459.</p>
+
+  <h2>Verificar sin KRONOS</h2>
+  <p>La especificacion es publica. Cualquiera puede reimplementar la verificacion en el lenguaje que prefiera. El algoritmo es:</p>
+  <pre><code>function verify(file, receipt) {
+  if (sha256(file) !== receipt.fileSha256) return false
+  const leaf = sha256(0x00 || file)
+  if (leaf !== receipt.leafHash) return false
+  let h = leaf
+  for (const step of receipt.proof) {
+    if (step === null) continue
+    h = step.side === "R"
+      ? sha256(0x01 || h || step.hash)
+      : sha256(0x01 || step.hash || h)
+  }
+  return h === receipt.root
+}</code></pre>
+
+  <h2>API publica</h2>
+  <p>El paquete <code>@kronos/sha256-verifier</code> implementa la verificacion completa. Cero dependencias externas. Disponible como libreria y como CLI.</p>
+  <pre><code>npm i @kronos/sha256-verifier</code></pre>
+  <p>Uso basico:</p>
+  <pre><code>import { seal, verifySeal } from "@kronos/sha256-verifier";
+const s = seal(buffer);
+const r = verifySeal(buffer, s);
+// r.ok === true</code></pre>
+
+  <h2>Mas informacion</h2>
+  <ul>
+    <li><strong>Manifiesto Universal</strong><span><a href="/manifiesto">Los principios detras del proyecto</a></span></li>
+    <li><strong>Verificador publico</strong><span><a href="/">Interfaz para verificar receipts</a></span></li>
+    <li><strong>Especificacion RFC 6962</strong><span><a href="https://datatracker.ietf.org/doc/html/rfc6962" rel="noopener noreferrer" target="_blank">Certificate Transparency (referencia de Merkle Tree)</a></span></li>
+  </ul>
+
+  <footer>
+    <p><a href="/">Verificador</a> · <a href="/manifiesto">Manifiesto</a> · <a href="/documentacion">Documentacion</a></p>
+    <p style="margin-top:.75rem">51% humano · 49% IA · Marco Valdovinos, Lerma 2026</p>
+  </footer>
+</main>
+</body>
+</html>

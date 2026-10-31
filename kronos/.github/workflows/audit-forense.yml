@@ -1,0 +1,20 @@
+name: audit-forense
+on:
+  schedule: [{ cron: '0 6 * * *' }]
+  workflow_dispatch:
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compute chain hash
+        run: |
+          TS=$(date -u +%Y%m%dT%H%M%SZ)
+          HASH=$(find . -type f -not -path './.git/*' -print0 | sort -z \
+                 | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)
+          echo "$TS $HASH" > .audit-chain.log
+      - uses: actions/upload-artifact@v4
+        with:
+          name: audit-${{ github.run_id }}
+          path: .audit-chain.log
+          retention-days: 365

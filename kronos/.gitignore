@@ -1,0 +1,15 @@
+node_modules/
+.next/
+.turbo/
+dist/
+build/
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+.audit-chain.log
+.scope-authorized
+*.log
+.DS_Store
+coverage/
+.vercel

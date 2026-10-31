@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <path id="arc" d="M 25,100 A 75,75 0 0 1 175,100" fill="none"/>
+  </defs>
+  <circle cx="100" cy="100" r="95" fill="none" stroke="#f59e0b" stroke-width="2"/>
+  <circle cx="100" cy="100" r="88" fill="none" stroke="#f59e0b" stroke-width="0.5"/>
+  <circle cx="100" cy="100" r="72" fill="none" stroke="#f59e0b" stroke-width="0.5" stroke-dasharray="2,3"/>
+  <text font-family="ui-monospace, monospace" font-size="8.5" fill="#f59e0b" letter-spacing="1.5">
+    <textPath href="#arc" startOffset="50%" text-anchor="middle">KRONOS · EVIDENCE INTEGRITY OS</textPath>
+  </text>
+  <text x="100" y="140" font-family="ui-monospace, monospace" font-size="7" fill="#f59e0b" letter-spacing="1" text-anchor="middle" opacity="0.7">2026 · LERMA MX</text>
+  <polygon points="100,62 132,81 132,119 100,138 68,119 68,81" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+  <polygon points="100,72 124,86 124,114 100,128 76,114 76,86" fill="#f59e0b" opacity="0.08"/>
+  <text x="100" y="113" font-family="ui-monospace, monospace" font-size="26" fill="#f59e0b" font-weight="bold" text-anchor="middle">K</text>
+</svg>
