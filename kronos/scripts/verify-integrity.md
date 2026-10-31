@@ -1,17 +1,20 @@
 # verify-integrity.sh — notas
 
-## Reproducibilidad
+## Esquema actual (#19+): `git ls-files`
 
-El script usa `find .` para descubrir archivos. Incluye gitignored files
-(`.kronos-chain/`, `.vercel/`, `.env`). Localmente produce un hash
-reproducible solo si esos directorios no existen o estan vacios.
+El script hashea solo archivos tracked por git. Paths relativos sin `./`.
+Reproducible desde cualquier `git clone` del repo.
 
-En CI (fresh clone) el hash difiere porque los gitignored files no existen.
-El workflow `kronos-ci.yml` lo ejecuta como informativo (`::warning::`),
-no bloqueante.
+## Histórico (#15–#18): `find .`
 
-## Fix futuro
+Versión anterior usaba `find .` que incluía gitignored files en local
+y no en CI. El hash resultante NO era reproducible desde un clon limpio.
+Esas anclas quedan como registro histórico del esquema viejo.
 
-Migrar de `find .` a `git ls-files -z` para hashear solo archivos tracked.
-Requiere ancla #17+ con hash reproducible desde cualquier `git clone`.
-Las anclas #15/#16 usaban `find`, son reproducibles solo con los paths originales.
+Migración a `git ls-files` en ancla #19. Los hashes de #15–#18 no
+son comparables con #19+ por el cambio de esquema.
+
+## Exclusión del propio log
+
+`.audit-chain.log*` se excluye del hash para evitar auto-referencia
+(el log contiene el hash de sí mismo). Patrón: `^\.audit-chain\.log`.
