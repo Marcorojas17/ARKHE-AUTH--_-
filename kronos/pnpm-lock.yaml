@@ -8,6 +8,8 @@ importers:
 
   .: {}
 
+  apps/web-verify: {}
+
   packages/core-kronos:
     dependencies:
       '@kronos/sha256-verifier':
