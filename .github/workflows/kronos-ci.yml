@@ -3,7 +3,9 @@ name: kronos-ci
 on:
   push:
     branches: [main]
-    paths: ['kronos/**']
+    paths:
+      - 'kronos/**'
+      - '.github/workflows/kronos-ci.yml'
   pull_request:
     paths: ['kronos/**']
   workflow_dispatch:
