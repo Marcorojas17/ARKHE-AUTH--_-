@@ -1,0 +1,14 @@
+{
+  "name": "@kronos/sha256-verifier",
+  "version": "0.1.0",
+  "description": "Verificacion SHA-256 con receipts portables. Cero dependencias.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": { ".": "./src/index.js" },
+  "bin": { "kronos-hash": "bin/kronos-hash.js" },
+  "files": ["src", "bin", "README.md"],
+  "keywords": ["sha256", "merkle", "integrity", "evidence", "kronos"],
+  "license": "MIT",
+  "engines": { "node": ">=18" },
+  "scripts": { "test": "node --test tests/*.test.js" }
+}

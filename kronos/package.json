@@ -1,0 +1,11 @@
+{
+  "name": "kronos",
+  "private": true,
+  "version": "0.0.1",
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "build:web": "pnpm -r --filter './apps/web-*' run build",
+    "test": "pnpm -r run test",
+    "verify": "./scripts/verify-integrity.sh"
+  }
+}

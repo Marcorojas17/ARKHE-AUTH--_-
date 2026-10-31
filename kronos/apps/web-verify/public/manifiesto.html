@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manifiesto · KRONOS</title>
+  <meta name="description" content="Manifiesto del ecosistema KRONOS. Integridad documental forense y descentralizada desde Lerma, Mexico.">
+  <link rel="icon" type="image/svg+xml" href="/sello.svg">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font:15px/1.7 system-ui,sans-serif;background:#0a0a0a;color:#e5e5e5;min-height:100vh;padding:2rem 1rem}
+    main{max-width:680px;margin:0 auto}
+    header{display:flex;align-items:center;gap:1rem;margin-bottom:3rem;padding-bottom:1.5rem;border-bottom:1px solid #262626}
+    header img{width:140px;height:auto}
+    header a{margin-left:auto;color:#888;text-decoration:none;font-size:.85rem}
+    header a:hover{color:#f59e0b}
+    h1{font-size:2rem;font-weight:700;margin-bottom:.5rem;letter-spacing:-.02em}
+    .meta{color:#888;font-size:.85rem;margin-bottom:3rem}
+    h2{font-size:1.15rem;font-weight:600;margin:2.5rem 0 .75rem;color:#f59e0b;letter-spacing:.02em}
+    p{margin-bottom:1rem;color:#d4d4d4}
+    strong{color:#e5e5e5;font-weight:600}
+    em{color:#f59e0b;font-style:normal;font-weight:500}
+    blockquote{border-left:2px solid #f59e0b;padding-left:1.25rem;margin:1.5rem 0;color:#a3a3a3;font-style:italic}
+    footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid #262626;color:#666;font-size:.85rem;text-align:center}
+    footer a{color:#888;text-decoration:none}
+    footer a:hover{color:#f59e0b}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="/logo.svg" alt="KRONOS">
+    <a href="/">Verificador</a>
+  </header>
+
+  <h1>Manifiesto Universal</h1>
+  <p class="meta">Lerma, Estado de Mexico · 2026 · v1.0</p>
+
+  <h2>1. El problema</h2>
+  <p>Un documento sin prueba de integridad es solo una promesa. Cualquier archivo puede ser alterado, cualquier firma puede ser falsificada, cualquier sello puede ser removido. La evidencia desaparece sin dejar rastro.</p>
+  <p>Los sistemas actuales dependen de que confies en el servidor. Confies en que no borro nada. Confies en que no cambio nada. Confies en que el hash que te muestro es el hash real. <strong>Eso no es integridad, es fe.</strong></p>
+
+  <h2>2. La propuesta</h2>
+  <p>KRONOS construye un sistema donde la integridad no requiere confianza. Cada documento recibe un sello criptografico que cualquiera puede verificar sin contactar a nuestro servidor. El archivo nunca sale del dispositivo del usuario. La prueba viaja con el documento.</p>
+  <blockquote>KRONOS no certifica que un documento sea autentico. Certifica que ese documento existia en un momento especifico y que no ha cambiado desde entonces.</blockquote>
+
+  <h2>3. Principios</h2>
+  <p><strong>Integridad verificable.</strong> La prueba no depende de nosotros. Si desaparecemos mañana, tus receipts siguen siendo validos con la especificacion publica.</p>
+  <p><strong>Verificacion en cliente.</strong> El archivo nunca sale del dispositivo del usuario. El hash se calcula en el navegador con Web Crypto API. Nosotros no vemos tus documentos.</p>
+  <p><strong>Anclaje externo.</strong> Las raices Merkle se anclan on-chain. La prueba no vive solo en nuestra infraestructura. Vive donde nadie puede borrarla.</p>
+  <p><strong>Estandares abiertos.</strong> SHA-256, Merkle Trees RFC 6962, domain separation. Nada propietario. Nada patentado. Cualquiera puede reimplementar el protocolo.</p>
+  <p><strong>Trazabilidad append-only.</strong> Nada se borra. Las correcciones se agregan, no se reescriben. El pasado es inmutable, como debe ser para evidencia forense.</p>
+
+  <h2>4. Lo que KRONOS no es</h2>
+  <p>No es un notario digital. No reemplaza la fe publica. No valida la autoria de un documento. No dice si lo que dice el documento es verdad. Solo dice: <em>este archivo existia en este momento y no ha cambiado desde entonces</em>.</p>
+  <p>No es una blockchain. Usa blockchain como una capa de anclaje. La logica principal vive off-chain, donde es rapida, barata y auditable.</p>
+  <p>No es una plataforma de identidad. No sabe quien eres. No necesita saberlo. Los receipts son anonimos por diseño.</p>
+
+  <h2>5. El legado</h2>
+  <p>El nombre KRONOS es el guardian del tiempo en la mitologia griega. La tesis que sostiene este proyecto es simple: <em>el legado no se construye firmando papeles, se construye acumulando prueba criptografica durante años</em>.</p>
+  <p>Cada documento que se sella hoy es un eslabon mas en una cadena que crece y que nadie podra reescribir. Eso es lo que buscamos: un pasado demostrable.</p>
+
+  <h2>6. Soberania</h2>
+  <p>Este proyecto se construye desde Lerma, Estado de Mexico. No es Silicon Valley. No busca capital riesgo. Se financia con clientes reales que necesitan la prueba y estan dispuestos a pagar por ella.</p>
+  <p>La infraestructura prioriza lo que se puede auditar sobre lo que se puede escalar. Lo que se puede leer sobre lo que se puede usar sin entender. La soberania tecnica empieza por entender lo que corres.</p>
+
+  <footer>
+    <p><a href="/">Verificador</a> · <a href="/documentacion">Documentacion</a> · <a href="/">KRONOS</a></p>
+    <p style="margin-top:.75rem">51% humano · 49% IA · Marco Valdovinos, Lerma 2026</p>
+  </footer>
+</main>
+</body>
+</html>

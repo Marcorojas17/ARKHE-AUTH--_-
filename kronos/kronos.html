@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KRONOS Lite</title>
+<style>
+body{margin:0;background:#05040a;color:#eee;font-family:system-ui;padding:20px}
+#bg{position:fixed;inset:0;z-index:0;opacity:.5;pointer-events:none}
+.w{max-width:600px;margin:auto;position:relative;z-index:1}
+h1{font-size:1.5rem;color:#ff9f1c}
+.card{background:rgba(16,12,32,.7);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px;margin:12px 0}
+.drop{border:2px dashed rgba(255,159,28,.3);border-radius:8px;padding:20px;text-align:center;cursor:pointer}
+.drop:hover{border-color:#ff9f1c}
+.hash{background:#000;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px;font-family:monospace;font-size:11px;word-break:break-all;color:#ff9f1c;margin-top:12px;min-height:40px}
+button{background:#ff9f1c;border:none;color:#000;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer;margin:6px 6px 0 0}
+button:disabled{opacity:.3;cursor:not-allowed}
+input,textarea{width:100%;box-sizing:border-box;background:#000;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#fff;font-family:monospace;font-size:12px;padding:10px;margin-top:6px}
+.result{padding:16px;border-radius:8px;text-align:center;font-weight:700;margin-top:12px;display:none}
+.match{background:rgba(0,255,102,.1);border:2px solid #00ff66;color:#00ff66;display:block}
+.nomatch{background:rgba(255,0,85,.1);border:2px solid #ff0055;color:#ff0055;display:block}
+small{font-size:10px;font-family:monospace;display:block;margin-top:6px;font-weight:400;word-break:break-all}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="w">
+<h1>🔐 KRONOS Lite</h1>
+<div class="card">
+<b>1. Hash de archivo</b>
+<div class="drop" id="d1">📄 Toca para elegir<input type="file" id="i1" style="display:none"></div>
+<div class="hash" id="o1">—</div>
+<button id="b1" disabled>Calcular hash</button>
+<button id="b2" disabled>Descargar recibo</button>
+</div>
+<div class="card">
+<b>2. Verificar archivo</b>
+<textarea id="exp" placeholder="Pega aquí el hash de 64 caracteres" rows="2"></textarea>
+<div class="drop" id="d2" style="margin-top:8px">📄 Toca para elegir<input type="file" id="i2" style="display:none"></div>
+<button id="b3" disabled>Verificar</button>
+<div class="result" id="r1"></div>
+</div>
+</div>
+<script>
+(function(){
+var c=document.getElementById('bg'),x=c.getContext('2d'),ch='0123456789ABCDEF',cols,dr;
+function init(){c.width=innerWidth;c.height=innerHeight;cols=Math.floor(c.width/16);dr=Array(cols).fill(0).map(function(){return Math.random()*-50})}
+init();addEventListener('resize',init);
+setInterval(function(){x.fillStyle='rgba(5,4,10,.1)';x.fillRect(0,0,c.width,c.height);x.font='13px monospace';for(var i=0;i<cols;i++){x.fillStyle=Math.random()>.95?'rgba(255,159,28,.6)':'rgba(255,159,28,.15)';x.fillText(ch[Math.floor(Math.random()*16)],i*16,dr[i]*16);if(dr[i]*16>c.height&&Math.random()>.97)dr[i]=0;dr[i]++}},80);
+var K=new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+function rotr(v,n){return ((v>>>n)|(v<<(32-n)))>>>0}
+function sha256p(d){var m=typeof d==='string'?new TextEncoder().encode(d):new Uint8Array(d);var l=m.length;var pad=new Uint8Array(l+1+((56-(l+1)%64)+64)%64+8);pad.set(m);pad[l]=0x80;var dv=new DataView(pad.buffer);var bl=l*8;dv.setUint32(pad.length-8,Math.floor(bl/0x100000000),false);dv.setUint32(pad.length-4,bl>>>0,false);var H=new Uint32Array([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]);var w=new Uint32Array(64);for(var i=0;i<pad.length;i+=64){for(var j=0;j<16;j++)w[j]=dv.getUint32(i+j*4,false);for(var j=16;j<64;j++){var s0=rotr(w[j-15],7)^rotr(w[j-15],18)^(w[j-15]>>>3);var s1=rotr(w[j-2],17)^rotr(w[j-2],19)^(w[j-2]>>>10);w[j]=(w[j-16]+s0+w[j-7]+s1)>>>0}var a=H[0],b=H[1],cc=H[2],dd=H[3],e=H[4],f=H[5],g=H[6],h=H[7];for(var j=0;j<64;j++){var S1=rotr(e,6)^rotr(e,11)^rotr(e,25);var chh=(e&f)^(~e&g);var t1=(h+S1+chh+K[j]+w[j])>>>0;var S0=rotr(a,2)^rotr(a,13)^rotr(a,22);var mj=(a&b)^(a&cc)^(b&cc);var t2=(S0+mj)>>>0;h=g;g=f;f=e;e=(dd+t1)>>>0;dd=cc;cc=b;b=a;a=(t1+t2)>>>0}H[0]=(H[0]+a)>>>0;H[1]=(H[1]+b)>>>0;H[2]=(H[2]+cc)>>>0;H[3]=(H[3]+dd)>>>0;H[4]=(H[4]+e)>>>0;H[5]=(H[5]+f)>>>0;H[6]=(H[6]+g)>>>0;H[7]=(H[7]+h)>>>0}var out='';for(var i=0;i<8;i++)out+=H[i].toString(16).padStart(8,'0');return out}
+var hasSubtle=!!(window.crypto&&window.crypto.subtle);
+async function hashHex(buf){if(hasSubtle){try{var h=await crypto.subtle.digest('SHA-256',buf);return Array.from(new Uint8Array(h)).map(function(b){return b.toString(16).padStart(2,'0')}).join('')}catch(e){}}return sha256p(buf)}
+var file1=null,hash1=null,file2=null;
+var d1=document.getElementById('d1'),i1=document.getElementById('i1'),d2=document.getElementById('d2'),i2=document.getElementById('i2');
+d1.onclick=function(){i1.click()};d2.onclick=function(){i2.click()};
+i1.onchange=function(){if(i1.files[0]){file1=i1.files[0];d1.innerHTML='📄 '+file1.name;document.getElementById('b1').disabled=false;document.getElementById('b2').disabled=true;document.getElementById('o1').textContent='—'}};
+i2.onchange=function(){if(i2.files[0]){file2=i2.files[0];d2.innerHTML='📄 '+file2.name;document.getElementById('b3').disabled=false;document.getElementById('r1').className='result'}};
+document.getElementById('b1').onclick=async function(){if(!file1)return;var btn=document.getElementById('b1');btn.disabled=true;btn.textContent='...';var buf=await file1.arrayBuffer();hash1=await hashHex(buf);document.getElementById('o1').textContent=hash1;btn.disabled=false;btn.textContent='Calcular hash';document.getElementById('b2').disabled=false};
+document.getElementById('b2').onclick=function(){if(!hash1)return;var txt='KRONOS RECIBO\nArchivo: '+file1.name+'\nTamaño: '+file1.size+' bytes\nSHA-256: '+hash1+'\nFecha: '+new Date().toISOString()+'\n\nPrueba técnica, no legal.';var b=new Blob([txt],{type:'text/plain'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=file1.name+'.sha256.txt';a.click()};
+document.getElementById('b3').onclick=async function(){if(!file2)return;var exp=document.getElementById('exp').value.trim().toLowerCase();if(!/^[0-9a-f]{64}$/.test(exp)){alert('Hash debe ser 64 caracteres hex');return}var buf=await file2.arrayBuffer();var comp=await hashHex(buf);var r=document.getElementById('r1');if(comp===exp){r.className='result match';r.innerHTML='✅ MATCH<small>'+comp+'</small>'}else{r.className='result nomatch';r.innerHTML='❌ NO MATCH<small>Esperado: '+exp+'<br>Obtenido: '+comp+'</small>'}};
+})();
+</script>
+</body>
+</html>

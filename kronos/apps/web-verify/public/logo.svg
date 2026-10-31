@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 40" width="240" height="40">
+  <rect x="0" y="6" width="28" height="28" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+  <polygon points="14,10 24,16 24,24 14,30 4,24 4,16" fill="#f59e0b" opacity="0.15"/>
+  <text x="14" y="26" font-family="ui-monospace, monospace" font-size="16" fill="#f59e0b" font-weight="bold" text-anchor="middle">K</text>
+  <text x="36" y="20" font-family="ui-monospace, monospace" font-size="14" fill="#e5e5e5" font-weight="600" letter-spacing="1">KRONOS</text>
+  <text x="36" y="32" font-family="ui-monospace, monospace" font-size="7" fill="#888" letter-spacing="1.5">EVIDENCE INTEGRITY OS</text>
+</svg>

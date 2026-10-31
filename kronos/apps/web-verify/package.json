@@ -1,0 +1,12 @@
+{
+  "name": "@kronos/web-verify",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "Verificador publico de receipts Kronos. Corre offline en el navegador.",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs"
+  },
+  "engines": { "node": ">=18" }
+}

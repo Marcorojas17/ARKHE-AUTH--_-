@@ -1,0 +1,19 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .: {}
+
+  packages/core-kronos:
+    dependencies:
+      '@kronos/sha256-verifier':
+        specifier: workspace:*
+        version: link:../sha256-verifier
+
+  packages/sha256-verifier: {}
+
+  packages/ui: {}
